@@ -1,0 +1,16 @@
+# Original code
+FloorplanToBlender3d_origin/
+
+
+# Files
+*.fbx
+*.png
+*.jpg
+*.gif
+*.txt
+*.ini
+*.blend
+
+
+# etc
+__pycache__/
