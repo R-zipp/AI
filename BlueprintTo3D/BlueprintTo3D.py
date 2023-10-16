@@ -35,8 +35,8 @@ class BLueprintTo3D():
 
         config = configparser.ConfigParser()
         config.read(config_path)
-        config.set('IMAGE', 'image_path', '"Images/Examples/example2.png"')
-        # config.set('IMAGE', 'image_path', '"Images/Test_img/Test_img1_grayscale.jpg"')
+        # config.set('IMAGE', 'image_path', '"Images/Examples/example2.png"')
+        config.set('IMAGE', 'image_path', '"Images/Test_img/OCR_img.png"')
 
         with open(config_path, 'w') as configfile:
             config.write(configfile)
