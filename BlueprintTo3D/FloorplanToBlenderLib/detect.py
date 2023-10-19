@@ -171,7 +171,7 @@ def find_rooms(
             rooms.append(component)
             color = np.random.randint(0, 255, size=3)
         img[component] = color
-    return rooms, img, mask
+    return rooms, img
 
 
 def and_remove_precise_boxes(detect_img, output_img=None, color=[255, 255, 255]):

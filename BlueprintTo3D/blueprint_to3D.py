@@ -16,9 +16,8 @@ class BLueprintTo3D():
         self.image_path = ""
         self.blender_install_path = ""
         self.data_folder = const.BASE_PATH
-        self.target_folder = const.TARGET_PATH
         self.blender_install_path = config.get_default_blender_installation_path()
-        self.floorplans = []
+        self.target_folder = const.TARGET_PATH
         self.image_paths = []
         self.program_path = os.path.dirname(os.path.realpath(__file__))
         self.blender_script_path = const.BLENDER_SCRIPT_PATH
@@ -27,7 +26,11 @@ class BLueprintTo3D():
         
         dialog.end_copyright()
 
-    def make_blend(self):
+
+    def make_blend(self, img_path):
+        self.floorplans = []
+
+        print("")
         print("Creates blender project")
         print("")
 
@@ -35,8 +38,7 @@ class BLueprintTo3D():
 
         config = configparser.ConfigParser()
         config.read(config_path)
-        # config.set('IMAGE', 'image_path', '"Images/Examples/example2.png"')
-        config.set('IMAGE', 'image_path', '"Images/Test_img/OCR_img.png"')
+        config.set('IMAGE', 'image_path', f'\"{img_path}\"')
 
         with open(config_path, 'w') as configfile:
             config.write(configfile)
@@ -53,13 +55,15 @@ class BLueprintTo3D():
 
         if isinstance(data_paths[0], list):
             for paths in data_paths:
-                create_blender_project.create_blender_project(paths)
+                blender_project_path = create_blender_project.create_blender_project(paths, self.target_folder)
         else:
-            create_blender_project.create_blender_project(data_paths)
+            blender_project_path = create_blender_project.create_blender_project(data_paths, self.target_folder)
 
-
+        return blender_project_path
 
 
 if __name__ == "__main__":
+    img_path = "Images/Test_img/OCR_img.png"
     bLueprint_to_3D = BLueprintTo3D()
-    bLueprint_to_3D.make_blend()
+    project_path = bLueprint_to_3D.make_blend(img_path)
+    print(project_path)

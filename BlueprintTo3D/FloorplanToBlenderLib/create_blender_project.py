@@ -16,8 +16,7 @@ Copyright (C) 2022 Daniel Westberg
 """
 
 
-def create_blender_project(data_paths):
-    target_folder = const.TARGET_PATH
+def create_blender_project(data_paths, target_folder):
     blender_install_path = ""
     blender_install_path = config.get_default_blender_installation_path()
     program_path = os.path.dirname(os.path.realpath(__file__))
@@ -65,4 +64,6 @@ def create_blender_project(data_paths):
         )
         print("Object created at:" + program_path + target_base + outformat)
 
-    print("Project created at: " + program_path + target_path)
+    print("Project created at: " + '/'.join(program_path.split('\\')[:-1]) + target_path)
+
+    return '/'.join(program_path.split('\\')[:-1]) + target_path
