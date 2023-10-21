@@ -1,5 +1,7 @@
 import bpy
 import os
+import io
+import contextlib
 
 
 class BlendToFBX():
@@ -18,6 +20,7 @@ class BlendToFBX():
 
         bpy.ops.wm.open_mainfile(filepath=blend_file)
 
+        print('------------------------------')
         #Deselect all
         bpy.ops.object.select_all(action='DESELECT')
 
@@ -35,7 +38,11 @@ class BlendToFBX():
         bpy.ops.object.join()
 
         fbx_file = os.path.join(fbx_dir, f'{name}_join_all.fbx')
-        bpy.ops.export_scene.fbx(filepath=fbx_file)
+
+        fake_stdout = io.StringIO()
+        with contextlib.redirect_stdout(fake_stdout):
+            print("이 메시지는 보이지 않습니다.")
+            bpy.ops.export_scene.fbx(filepath=fbx_file)
 
         bpy.ops.wm.quit_blender()
 

@@ -8,7 +8,6 @@ from pathlib import Path
 import os
 from datetime import datetime
 import requests
-import json
 
 from lib.preprocessing import PreProcessing
 from lib.blend_to_fbx import BlendToFBX
@@ -88,7 +87,7 @@ async def upload_image(request: Request):
 
 
 
-@app.post("/uploadfile/")
+@app.post("/image_to_fbx")
 async def create_upload_file(file: UploadFile = File(...)):
     # 업로드된 파일의 확장자 확인
     if not file.filename.lower().endswith((".jpg", ".jpeg", ".png")):
@@ -108,7 +107,6 @@ async def create_upload_file(file: UploadFile = File(...)):
         ouput_path = 'statics/Images/After_preprocessing'
         preprocessing.run(str(file_path), ouput_path)
         preprocessing_result = preprocessing.file_save_path('OCR')
-        print(preprocessing_result)
 
         # Image to blend file
         url = 'http://127.0.0.1:8001/blueprint_to_3D'
@@ -116,8 +114,7 @@ async def create_upload_file(file: UploadFile = File(...)):
         data = {'ImagePath': preprocessing_result}
 
         response = requests.post(url, json=data)
-        print('Status Code:', response.status_code)
-        print('Response Content:', response.text)
+        print(f'Status Code: {response.status_code}  /  Response Content : {response.text}')
 
         # Blend to fbx converter
         blend_name = response.text.replace('"','')
@@ -129,4 +126,4 @@ async def create_upload_file(file: UploadFile = File(...)):
     finally:
         file.file.close()
 
-    return {"filename": fbx_dir}
+    return {"FbxPath": blend_path}

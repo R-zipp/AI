@@ -40,8 +40,11 @@ class PreProcessing():
 
         OCR_img = self.img.copy()
 
+
         for result in results:
-            cv2.rectangle(OCR_img, result[0][0], result[0][2], (255, 255, 255), -1)
+            check_int = any([True if isinstance(i, np.int32) else False for i in result[0][0] + result[0][2]])
+            if check_int:
+                cv2.rectangle(OCR_img, result[0][0], result[0][2], (255, 255, 255), -1)
 
         if save:
             print(f'Remove text done : {self.name}_OCR.png')
@@ -52,9 +55,9 @@ class PreProcessing():
     
     def file_save_path(self, target):
         if target == 'binary':
-            return os.path.join(self.output_path, f'{self.name}_bi.png')
+            return self.output_path + '/' + f'{self.name}_bi.png'
         elif target == 'OCR':
-            return os.path.join(self.output_path, f'{self.name}_OCR.png')
+            return self.output_path + '/' + f'{self.name}_OCR.png'
         else:
             raise ValueError("You can only choose 'binary' or 'OCR'")
 
