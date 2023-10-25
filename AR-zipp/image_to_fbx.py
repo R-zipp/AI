@@ -17,16 +17,19 @@ class ImageToFBX():
         print('')
         # Preprocessing
         ouput_path = 'statics/Images/After_preprocessing'
-        preprocessing.run(file_path, ouput_path)
-        preprocessing_result = preprocessing.file_save_path('OCR')
+        preprocessing.run(file_path)
+        preprocessing_result = preprocessing.file_save(ouput_path)
 
         # Image to blend file
-        url = 'http://127.0.0.1:8001/blueprint_to_3D'
+        # url = 'http://127.0.0.1:8001/blueprint_to_3D'
 
-        data = {'ImagePath': preprocessing_result}
+        # data = {'ImagePath': preprocessing_result}
 
-        response = requests.post(url, json=data)
-        print(f'Status Code: {response.status_code}  /  Response Content : {response.text}')
+        # for i in range(3):
+        #     response = requests.post(url, json=data)
+        #     print(f'Status Code: {response.status_code}  /  Response Content : {response.text}')
+        #     if response.status_code == 200:
+        #         break
 
         # if response.status_code == 200:   
         #     time.sleep(0.5)
@@ -49,9 +52,9 @@ if __name__ == '__main__':
     file_dir = 'statics\\Images\\Original'
     file_list = os.listdir(file_dir)
 
-    file_path = str(file_dir+'\\'+'image_000.jpg')
-    ItoFBX.image_to_fbx(file_path)
+    # file_path = str(file_dir+'\\'+'image_000.jpg')
+    # ItoFBX.image_to_fbx(file_path)
 
-    # for file in file_list[55:]:
-    #     file_path = str(file_dir+'\\'+file)
-    #     ItoFBX.image_to_fbx(file_path)
+    for file in file_list[:]:
+        file_path = str(file_dir+'\\'+file)
+        ItoFBX.image_to_fbx(file_path)

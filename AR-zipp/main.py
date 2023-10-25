@@ -11,18 +11,25 @@ import requests
 
 from lib.preprocessing import PreProcessing
 from lib.blend_to_fbx import BlendToFBX
+from image_to_fbx import ImageToFBX
 
 
 app = FastAPI()
 preprocessing = PreProcessing()
 converter = BlendToFBX()
+ItoFBX = ImageToFBX()
 
 app.mount("/statics", StaticFiles(directory="statics"), name="statics")
 
 
 
 class Item(BaseModel):
-    ImagePath: str
+  drawingType: str
+  userDrawingImage: str
+
+class ImageReceive(BaseModel):
+  drawingType: str
+  userDrawingImage: str
 
 class Image_bi(BaseModel):
     ImagePath: str
@@ -51,14 +58,29 @@ async def create_user(item: Item):
 
 @app.post("/test_api/in_json_out_json")
 async def create_user(item: Item):
-    return_json = {
-        'ImagePath' : item.ImagePath
-    }
     now = datetime.now()
     print('')
-    print(f'in_json_out_json / {now}')
+    print(f'in_json_out_json / {now} / {item.userDrawingImage}')
     print('')
-    return JSONResponse(content=return_json)
+
+    response = requests.get(item.userDrawingImage, stream=True)
+    if response.status_code == 200:
+        # raw 데이터를 파일로 작성합니다.
+        with open("downloaded_image.jpg", 'wb') as file:
+            for chunk in response.iter_content(chunk_size=128):
+                file.write(chunk)
+    else:
+        print(f"Error downloading image: {response.status_code}")
+    
+    fbx_file = 'statics/fbx_file/image_001_OCR_join_all.fbx'
+
+    url = 'http://127.0.0.1:8001/blueprint_to_3D'
+
+    data = {
+        'ImagePath': fbx_file
+        }
+    
+    return JSONResponse(content=data)
 
 
 @app.post("/test_api/in_img_out_json")
@@ -87,43 +109,95 @@ async def upload_image(request: Request):
 
 
 
+# @app.post("/image_to_fbx")
+# async def create_upload_file(file: UploadFile = File(...)):
+#     # 업로드된 파일의 확장자 확인
+#     if not file.filename.lower().endswith((".jpg", ".jpeg", ".png")):
+#         raise HTTPException(status_code=400, detail="Invalid file format!")
+
+#     try:
+#         file_dir = f"statics/Images/uploads/"
+#         storage_path = Path(file_dir)
+#         if not os.path.exists(storage_path):
+#             storage_path.mkdir(parents=True, exist_ok=True)
+
+#         file_path = storage_path / file.filename
+#         with file_path.open("wb") as buffer:
+#             shutil.copyfileobj(file.file, buffer)
+
+#         # Preprocessing
+#         ouput_path = 'statics/Images/After_preprocessing'
+#         preprocessing.run(str(file_path), ouput_path)
+#         preprocessing_result = preprocessing.file_save_path('OCR')
+
+#         # Image to blend file
+#         url = 'http://127.0.0.1:8001/blueprint_to_3D'
+
+#         data = {'ImagePath': preprocessing_result}
+
+#         response = requests.post(url, json=data)
+#         print(f'Status Code: {response.status_code}  /  Response Content : {response.text}')
+
+#         # Blend to fbx converter
+#         blend_name = response.text.replace('"','')
+#         blend_path = f"statics/blend_file/{blend_name}"
+#         print(blend_path)
+#         fbx_dir = 'statics/fbx_file'
+#         converter.blend_to_fbx(blend_path, fbx_dir)
+
+#     finally:
+#         file.file.close()
+
+#     return {"FbxPath": blend_path}
+
+
 @app.post("/image_to_fbx")
 async def create_upload_file(file: UploadFile = File(...)):
-    # 업로드된 파일의 확장자 확인
     if not file.filename.lower().endswith((".jpg", ".jpeg", ".png")):
         raise HTTPException(status_code=400, detail="Invalid file format!")
 
     try:
-        file_dir = f"statics/Images/uploads/"
-        storage_path = Path(file_dir)
+        storage_path = f"statics/Images/uploads/"
         if not os.path.exists(storage_path):
             storage_path.mkdir(parents=True, exist_ok=True)
 
-        file_path = storage_path / file.filename
-        with file_path.open("wb") as buffer:
+        file_path = storage_path +'/'+ file.filename
+        with open(file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
 
-        # Preprocessing
-        ouput_path = 'statics/Images/After_preprocessing'
-        preprocessing.run(str(file_path), ouput_path)
-        preprocessing_result = preprocessing.file_save_path('OCR')
+        ItoFBX.image_to_fbx(file_path)
 
-        # Image to blend file
-        url = 'http://127.0.0.1:8001/blueprint_to_3D'
-
-        data = {'ImagePath': preprocessing_result}
-
-        response = requests.post(url, json=data)
-        print(f'Status Code: {response.status_code}  /  Response Content : {response.text}')
-
-        # Blend to fbx converter
-        blend_name = response.text.replace('"','')
-        blend_path = f"statics/blend_file/{blend_name}"
-        print(blend_path)
-        fbx_dir = 'statics/fbx_file'
-        converter.blend_to_fbx(blend_path, fbx_dir)
+        blend_path = 'statics/fbx_file'
 
     finally:
         file.file.close()
 
     return {"FbxPath": blend_path}
+
+
+
+@app.post("/image_to_fbx")
+async def image_to_fbx(item: ImageReceive):
+    now = datetime.now()
+    print('')
+    print(f'in_json_out_json / {now} / {item.userDrawingImage}')
+    print('')
+
+    response = requests.get(item.userDrawingImage, stream=True)
+    if response.status_code == 200:
+        # raw 데이터를 파일로 작성합니다.
+        with open("downloaded_image.jpg", 'wb') as file:
+            for chunk in response.iter_content(chunk_size=128):
+                file.write(chunk)
+    else:
+        print(f"Error downloading image: {response.status_code}")
+    
+    fbx_file = 'statics/fbx_file/image_001_OCR_join_all.fbx'
+
+    url = 'http://127.0.0.1:8001/blueprint_to_3D'
+
+    data = {
+        'ImagePath': fbx_file
+        }
+    
+    return JSONResponse(content=data)
