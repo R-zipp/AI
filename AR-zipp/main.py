@@ -1,203 +1,198 @@
-from fastapi import FastAPI, Request, HTTPException, File, UploadFile
+from fastapi import FastAPI, UploadFile, File, HTTPException, Request
+from fastapi.responses import StreamingResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import JSONResponse
 from pydantic import BaseModel
-
-import shutil
-from pathlib import Path
-import os
-from datetime import datetime
+from typing import Dict
+import imghdr
+import io
 import requests
+from urllib.parse import urlparse
+from pathlib import Path
+from datetime import datetime
+import shutil
+import os
 
-from lib.preprocessing import PreProcessing
-from lib.blend_to_fbx import BlendToFBX
-from image_to_fbx import ImageToFBX
+from lib.etc import save_file_in_S3
+from lib.image_to_fbx import ImageToFBX
+
 
 
 app = FastAPI()
-preprocessing = PreProcessing()
-converter = BlendToFBX()
 ItoFBX = ImageToFBX()
 
 app.mount("/statics", StaticFiles(directory="statics"), name="statics")
 
 
+# Unreal Part
 
-class Item(BaseModel):
-  drawingType: str
-  userDrawingImage: str
+# @app.post("/unreal/test/img_to_fbx")
+# async def create_file(file: UploadFile = File(...)) -> Dict[str, str]:
+#     print('hahahaha')
+#     try:
+#         contents = await file.read()
+        
+#         file_type = imghdr.what(None, h=contents)
+#         if file_type not in ['jpeg', 'png', 'jpg']:
+#             raise HTTPException(status_code=400, detail="Invalid file format")
 
-class ImageReceive(BaseModel):
-  drawingType: str
-  userDrawingImage: str
+#         file_name = f"uploaded_file.{file_type}"
+#         with open(file_name, "wb") as out_file:
+#             out_file.write(contents)
 
-class Image_bi(BaseModel):
-    ImagePath: str
+#         fbx_file_path = 'statics/fbx_file/image_000_pre_join_all.fbx'
+#         with open(fbx_file_path, "rb") as fbx:
+#             fbx_data = fbx.read()
 
-
-
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
-
-
-@app.get("/fbx_file_list")
-def read_root():
-    fbx_files = [file for file in os.listdir('static/fbx_file') if file.endswith('.fbx')]
-    return {"fbx_list": fbx_files}
-
-
-@app.post("/test_api/in_json_out_str")
-async def create_user(item: Item):
-    now = datetime.now()
-    print('')
-    print(f'in_json_out_str / {now} / {item.ImagePath}')
-    print('')
-    return item.ImagePath
-
-
-@app.post("/test_api/in_json_out_json")
-async def create_user(item: Item):
-    now = datetime.now()
-    print('')
-    print(f'in_json_out_json / {now} / {item.userDrawingImage}')
-    print('')
-
-    response = requests.get(item.userDrawingImage, stream=True)
-    if response.status_code == 200:
-        # raw 데이터를 파일로 작성합니다.
-        with open("downloaded_image.jpg", 'wb') as file:
-            for chunk in response.iter_content(chunk_size=128):
-                file.write(chunk)
-    else:
-        print(f"Error downloading image: {response.status_code}")
+#         return StreamingResponse(io.BytesIO(fbx_data), media_type="application/octet-stream")
     
-    fbx_file = 'statics/fbx_file/image_001_OCR_join_all.fbx'
-
-    url = 'http://127.0.0.1:8001/blueprint_to_3D'
-
-    data = {
-        'ImagePath': fbx_file
-        }
-    
-    return JSONResponse(content=data)
+#     except Exception as e:
+#         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.post("/test_api/in_img_out_json")
+@app.post("/unreal/test/img_to_fbx")
 async def upload_image(request: Request):
     content_type = request.headers.get('content-type')
-    if content_type != 'image/jpeg':
+    now = datetime.now()
+    print(f'{now} / content_type : {content_type}')
+    if content_type not in  ['image/jpeg', 'image/png', 'image/jpg']:
         raise HTTPException(status_code=400, detail="Content-Type is not image/jpeg")
+    print('success')
+    return 'success'
+    # body = await request.body()
 
-    body = await request.body()
+    # try:
+    #     # 이미지 파일 저장할 경로 지정 (예: 현재 작업 디렉토리 아래의 'uploads' 폴더)
+    #     upload_folder = Path(os.getcwd()) / "uploads"
+    #     upload_folder.mkdir(parents=True, exist_ok=True)
 
-    try:
-        # 이미지 파일 저장할 경로 지정 (예: 현재 작업 디렉토리 아래의 'uploads' 폴더)
-        upload_folder = Path(os.getcwd()) / "uploads"
-        upload_folder.mkdir(parents=True, exist_ok=True)
+    #     # # 파일 경로 생성
+    #     file_path = upload_folder / "uploaded_image.jpg"
 
-        # # 파일 경로 생성
-        file_path = upload_folder / "uploaded_image.jpg"
-
-        with open(file_path, "wb") as image_file:
-            image_file.write(body)
+    #     with open(file_path, "wb") as image_file:
+    #         image_file.write(body)
         
-        return JSONResponse(content={"message": "Image uploaded successfully", "filename": 'file_path.name'}, status_code=200)
 
+    #     data = {
+    #         'Status': 'success'
+    #         }
+    #     print(data)
+    #     return JSONResponse(content=data)
+    
+    # except Exception as e:
+    #     raise HTTPException(status_code=500, detail=str(e))
+    
+
+@app.post("/unreal/img_to_fbx")
+async def create_file(file: UploadFile = File(...)) -> Dict[str, str]:
+    try:
+        contents = await file.read()
+
+        file_type = imghdr.what(None, h=contents)
+        if file_type not in ['jpeg', 'png', 'jpg']:
+            raise HTTPException(status_code=400, detail="Invalid file format")
+
+        file_name = f"uploaded_file.{file_type}"
+        with open(file_name, "wb") as out_file:
+            out_file.write(contents)
+
+        # 이제 FBX 파일을 읽고 스트리밍해야 합니다.
+        fbx_file_path = 'statics/fbx_file/image_000_pre_join_all.fbx'
+        with open(fbx_file_path, "rb") as fbx:
+            fbx_data = fbx.read()  # 파일의 바이트 내용을 읽습니다.
+
+        return StreamingResponse(io.BytesIO(fbx_data), media_type="application/octet-stream")
+    
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 
+# Spring Part
 
-# @app.post("/image_to_fbx")
-# async def create_upload_file(file: UploadFile = File(...)):
-#     # 업로드된 파일의 확장자 확인
-#     if not file.filename.lower().endswith((".jpg", ".jpeg", ".png")):
-#         raise HTTPException(status_code=400, detail="Invalid file format!")
+class ImageURL(BaseModel):
+    userDrawingImage: str
 
-#     try:
-#         file_dir = f"statics/Images/uploads/"
-#         storage_path = Path(file_dir)
-#         if not os.path.exists(storage_path):
-#             storage_path.mkdir(parents=True, exist_ok=True)
+@app.post("/spring/img_to_fbx_S3_origin")
+async def download_and_return_fbx(image_url: ImageURL):
+    # Validation
+    url = image_url.userDrawingImage
 
-#         file_path = storage_path / file.filename
-#         with file_path.open("wb") as buffer:
-#             shutil.copyfileobj(file.file, buffer)
+    if not url:
+        raise HTTPException(status_code=400, detail="URL is required")
 
-#         # Preprocessing
-#         ouput_path = 'statics/Images/After_preprocessing'
-#         preprocessing.run(str(file_path), ouput_path)
-#         preprocessing_result = preprocessing.file_save_path('OCR')
+    path = urlparse(url).path
+    file_name = path.split('/')[-1]
+    ext = Path(path).suffix.lower()  # ex: '.jpg', '.png'
 
-#         # Image to blend file
-#         url = 'http://127.0.0.1:8001/blueprint_to_3D'
+    if ext not in [".jpg", ".jpeg", ".png"]:
+        raise HTTPException(status_code=400, detail="Invalid file type, only .jpg, .jpeg and .png are allowed")
 
-#         data = {'ImagePath': preprocessing_result}
-
-#         response = requests.post(url, json=data)
-#         print(f'Status Code: {response.status_code}  /  Response Content : {response.text}')
-
-#         # Blend to fbx converter
-#         blend_name = response.text.replace('"','')
-#         blend_path = f"statics/blend_file/{blend_name}"
-#         print(blend_path)
-#         fbx_dir = 'statics/fbx_file'
-#         converter.blend_to_fbx(blend_path, fbx_dir)
-
-#     finally:
-#         file.file.close()
-
-#     return {"FbxPath": blend_path}
-
-
-@app.post("/image_to_fbx")
-async def create_upload_file(file: UploadFile = File(...)):
-    if not file.filename.lower().endswith((".jpg", ".jpeg", ".png")):
-        raise HTTPException(status_code=400, detail="Invalid file format!")
-
+    # File download
     try:
-        storage_path = f"statics/Images/uploads/"
-        if not os.path.exists(storage_path):
-            storage_path.mkdir(parents=True, exist_ok=True)
+        response = requests.get(url, stream=True)
 
-        file_path = storage_path +'/'+ file.filename
-        with open(file_path, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
+        if response.status_code != 200:
+            raise HTTPException(status_code=400, detail="Could not download image")
 
-        ItoFBX.image_to_fbx(file_path)
-
-        blend_path = 'statics/fbx_file'
-
-    finally:
-        file.file.close()
-
-    return {"FbxPath": blend_path}
-
-
-
-@app.post("/image_to_fbx")
-async def image_to_fbx(item: ImageReceive):
-    now = datetime.now()
-    print('')
-    print(f'in_json_out_json / {now} / {item.userDrawingImage}')
-    print('')
-
-    response = requests.get(item.userDrawingImage, stream=True)
-    if response.status_code == 200:
-        # raw 데이터를 파일로 작성합니다.
-        with open("downloaded_image.jpg", 'wb') as file:
-            for chunk in response.iter_content(chunk_size=128):
+        local_filename = f'statics/uploads/{file_name}'
+        with open(local_filename, 'wb') as file:
+            for chunk in response.iter_content(chunk_size=8192):
                 file.write(chunk)
-    else:
-        print(f"Error downloading image: {response.status_code}")
-    
-    fbx_file = 'statics/fbx_file/image_001_OCR_join_all.fbx'
 
-    url = 'http://127.0.0.1:8001/blueprint_to_3D'
+    except requests.RequestException as e:
+        raise HTTPException(status_code=400, detail=f"Requests exception: {e}")
 
-    data = {
-        'ImagePath': fbx_file
-        }
+    # Main process
+    try:
+        print('Run main process!')
+        fbx_file = ItoFBX.image_to_fbx(local_filename).replace('\\', '/')
+
+        file_url = save_file_in_S3(fbx_file)
+
+        return JSONResponse(content={'URL': file_url})
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Server error: {e}")
     
-    return JSONResponse(content=data)
+
+@app.post("/spring/img_to_fbx_S3")
+async def download_and_return_fbx(image_url: ImageURL):
+    # Validation
+    url = image_url.userDrawingImage
+
+    if not url:
+        raise HTTPException(status_code=400, detail="URL is required")
+
+    path = urlparse(url).path
+    file_name = path.split('/')[-1]
+    ext = Path(path).suffix.lower()  # ex: '.jpg', '.png'
+
+    if ext not in [".jpg", ".jpeg", ".png"]:
+        raise HTTPException(status_code=400, detail="Invalid file type, only .jpg, .jpeg and .png are allowed")
+
+    # File download
+    try:
+        response = requests.get(url, stream=True)
+
+        if response.status_code != 200:
+            raise HTTPException(status_code=400, detail="Could not download image")
+
+        local_filename = f'statics/uploads/{file_name}'
+        with open(local_filename, 'wb') as file:
+            for chunk in response.iter_content(chunk_size=8192):
+                file.write(chunk)
+
+    except requests.RequestException as e:
+        raise HTTPException(status_code=400, detail=f"Requests exception: {e}")
+
+    # Main process
+    try:
+        print('Run main process!')
+        # fbx_file = ItoFBX.image_to_fbx(local_filename).replace('\\', '/')
+        fbx_file_path = 'statics/fbx_file/image_000_pre_join_all.fbx'
+        # with open(fbx_file_path, "rb") as fbx:
+            # fbx_data = fbx.read()
+
+        file_url = save_file_in_S3(fbx_file_path)
+
+        return JSONResponse(content={'URL': file_url})
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Server error: {e}")

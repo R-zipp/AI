@@ -20,7 +20,6 @@ class BlendToFBX():
 
         bpy.ops.wm.open_mainfile(filepath=blend_file)
 
-        print('------------------------------')
         #Deselect all
         bpy.ops.object.select_all(action='DESELECT')
 
@@ -45,6 +44,12 @@ class BlendToFBX():
             bpy.ops.export_scene.fbx(filepath=fbx_file)
 
         bpy.ops.wm.quit_blender()
+
+        return fbx_file
+
+
+
+
 
 if __name__ == '__main__':
     blend_file = 'statics/blend_file/floorplan30.blend'

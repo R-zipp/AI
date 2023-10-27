@@ -1,9 +1,14 @@
 # Original code
 backup/FloorplanToBlender3d_origin/
-backup/Pix2pix/
 backup/pytorch-CycleGAN-and-pix2pix/
+backup/Pix2pix/
 backup/pytorch-hed/
+
+# Ignore directory
 backup/etc/
+
+# Security
+AR-zipp/resources
 
 
 # Files
@@ -14,6 +19,7 @@ backup/etc/
 *.txt
 *.ini
 *.blend
+*.json
 
 
 # etc
