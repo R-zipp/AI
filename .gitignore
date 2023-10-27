@@ -15,6 +15,7 @@ AR-zipp/resources
 *.fbx
 *.png
 *.jpg
+*.jpeg
 *.gif
 *.txt
 *.ini
