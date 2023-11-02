@@ -3,7 +3,7 @@ import numpy as np
 
 
 
-def outer_contours(detect_img, output_img=None, color=[255, 255, 255]):
+def outer_contours(detect_img, output_img=None, color=[255, 255, 255], thickness=3):
     OUTER_CONTOURS_TRESHOLD = [230, 255]
     PRECISE_BOXES_ACCURACY = 0.001
 
@@ -27,7 +27,7 @@ def outer_contours(detect_img, output_img=None, color=[255, 255, 255]):
     epsilon = PRECISE_BOXES_ACCURACY * cv2.arcLength(largest_contour, True)
     approx = cv2.approxPolyDP(largest_contour, epsilon, True)
     if output_img is not None:
-        output_img = cv2.drawContours(output_img, [approx], 0, color)
+        output_img = cv2.drawContours(output_img, [approx], -1, color, thickness)
     return approx, output_img
 
 
@@ -77,7 +77,7 @@ def wall_filter(gray):
     return unknown
 
 
-def precise_boxes(detect_img, output_img=None, color=[100, 100, 0]):
+def precise_boxes(detect_img, output_img=None, color=[100, 100, 0], thickness=2):
     PRECISE_BOXES_ACCURACY = 0.001
 
     res = []
@@ -90,7 +90,7 @@ def precise_boxes(detect_img, output_img=None, color=[100, 100, 0]):
         epsilon = PRECISE_BOXES_ACCURACY * cv2.arcLength(cnt, True)
         approx = cv2.approxPolyDP(cnt, epsilon, True)
         if output_img is not None:
-            output_img = cv2.drawContours(output_img, [approx], 0, color)
+            output_img = cv2.drawContours(output_img, [approx], -1, color, thickness)
         res.append(approx)
 
     return res, output_img

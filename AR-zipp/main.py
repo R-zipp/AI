@@ -111,7 +111,7 @@ async def create_file(file: UploadFile = File(...)) -> Dict[str, str]:
 class ImageURL(BaseModel):
     userDrawingImage: str
 
-@app.post("/spring/img_to_fbx_S3_origin")
+@app.post("/spring/img_to_fbx_S3")
 async def download_and_return_fbx(image_url: ImageURL):
     # Validation
     url = image_url.userDrawingImage
@@ -153,7 +153,7 @@ async def download_and_return_fbx(image_url: ImageURL):
         raise HTTPException(status_code=500, detail=f"Server error: {e}")
     
 
-@app.post("/spring/img_to_fbx_S3")
+@app.post("/spring/img_to_fbx_S3_test")
 async def download_and_return_fbx(image_url: ImageURL):
     # Validation
     url = image_url.userDrawingImage
@@ -192,7 +192,100 @@ async def download_and_return_fbx(image_url: ImageURL):
             # fbx_data = fbx.read()
 
         file_url = save_file_in_S3(fbx_file_path)
+        print(file_url)
+        return JSONResponse(content={'URL': file_url})
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Server error: {e}")
+    
+
+
+
+
+
+@app.post("/spring/img_to_fbx_S3_origin_own_test")
+async def download_and_return_fbx(file: UploadFile = File(...)):
+    # Validation
+    file_name = file.filename
+    ext = Path(file_name).suffix.lower()  # ex: '.jpg', '.png'
+
+    if ext not in [".jpg", ".jpeg", ".png"]:
+        raise HTTPException(status_code=400, detail="Invalid file type, only .jpg, .jpeg and .png are allowed")
+
+    # File save
+    local_filename = f'statics/uploads/{file_name}'
+    try:
+        with open(local_filename, 'wb') as buffer:
+            buffer.write(file.file.read())
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error saving file: {e}")
+
+    # Main process
+    try:
+        print('Run main process!')
+        fbx_file = ItoFBX.image_to_fbx(local_filename).replace('\\', '/')
+
+        file_url = save_file_in_S3(fbx_file)
 
         return JSONResponse(content={'URL': file_url})
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Server error: {e}")
+    
+    
+    
+    
+
+@app.post("/spring/img_to_fbx_S3_test_2")
+async def download_and_return_fbx(image_url: ImageURL):
+    # Validation
+    url = image_url.userDrawingImage
+
+    if not url:
+        raise HTTPException(status_code=400, detail="URL is required")
+
+    path = urlparse(url).path
+    file_name = path.split('/')[-1]
+    ext = Path(path).suffix.lower()  # ex: '.jpg', '.png'
+
+    if ext not in [".jpg", ".jpeg", ".png"]:
+        raise HTTPException(status_code=400, detail="Invalid file type, only .jpg, .jpeg and .png are allowed")
+
+    # File download
+    try:
+        response = requests.get(url, stream=True)
+
+        if response.status_code != 200:
+            raise HTTPException(status_code=400, detail="Could not download image")
+
+        local_filename = f'statics/uploads/{file_name}'
+        with open(local_filename, 'wb') as file:
+            for chunk in response.iter_content(chunk_size=8192):
+                file.write(chunk)
+
+    except requests.RequestException as e:
+        raise HTTPException(status_code=400, detail=f"Requests exception: {e}")
+
+    # Main process
+    try:
+        print('Run main process!')
+        # fbx_file = ItoFBX.image_to_fbx(local_filename).replace('\\', '/')
+        fbx_file_path = 'statics/fbx_file/image_000_pre_join_all.fbx'
+        # with open(fbx_file_path, "rb") as fbx:
+            # fbx_data = fbx.read()
+
+        file_url = save_file_in_S3(fbx_file_path)
+        print(file_url)
+        
+        # Send unreal-python sever
+        url = 'http://192.168.0.48:8000/fbx_download'
+
+        data = {'FBXfileURL': file_url}
+
+        response = requests.post(url, json=data)
+        print(f'Status Code: {response.status_code}  /  Response Content : {response.text}')
+        if response.status_code == 200:
+            pass
+        
+        return JSONResponse(content={'URL': file_url})
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Server error: {e}")
+    

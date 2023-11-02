@@ -4,8 +4,12 @@ backup/pytorch-CycleGAN-and-pix2pix/
 backup/Pix2pix/
 backup/pytorch-hed/
 
+HandToBlueprint/file_change/pytorch-hed-master/
+HandToBlueprint/torch_learning/pytorch-CycleGAN-and-pix2pix-master/
+
 # Ignore directory
 backup/etc/
+Babylon/
 
 # Security
 AR-zipp/resources
@@ -13,6 +17,7 @@ AR-zipp/resources
 
 # Files
 *.fbx
+*.glb
 *.png
 *.jpg
 *.jpeg

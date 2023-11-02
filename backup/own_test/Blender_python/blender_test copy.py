@@ -1,8 +1,9 @@
 import bpy
 
 # .blend 파일을 불러옵니다.
-blend_file = 'D:/workspace/Final_Project/FloorplanToBlender3d/Target/floorplan1.blend'
-blend_file = 'D:/workspace/Final_Project/FloorplanToBlender3d/Target/floorplan2.blend'
+# blend_file = 'D:/workspace/Final_Project/FloorplanToBlender3d/Target/floorplan1.blend'
+# blend_file = 'D:/workspace/Final_Project/FloorplanToBlender3d/Target/floorplan2.blend'
+blend_file = 'floorplan_test.blend'
 bpy.ops.wm.open_mainfile(filepath=blend_file)
 
 # 현재 scene을 가져옵니다.
@@ -42,7 +43,7 @@ bpy.ops.object.join()
 
 
 # .fbx 파일로 내보냅니다.
-fbx_file = 'floorplan_join.fbx'
+fbx_file = 'floorplan_test_join.fbx'
 bpy.ops.export_scene.fbx(filepath=fbx_file)
 
 # Blender 세션을 종료합니다.
