@@ -52,6 +52,13 @@ class CreateDataset():
         img[np.where(mask == 0)] = [255, 255, 255]
 
         return img
+    
+    
+    def make_grayscale(self, img):
+        gray_image = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        gray_image_3channel = cv2.cvtColor(gray_image, cv2.COLOR_GRAY2BGR)
+        
+        return gray_image_3channel
         
         
     def get_blueprint(self, img, padding_percent=0.2):
@@ -144,6 +151,7 @@ class CreateDataset():
         cv2.imwrite('temp.PNG', self.image)
         # self.image = self.make_binary(self.image, limit=self.limit)
         # self.image = self.remove_text(self.image)
+        self.image = self.make_grayscale(self.image)
         self.image = self.cutting_image(self.image)
 
         self.image = self.get_blueprint(self.image)
@@ -151,7 +159,7 @@ class CreateDataset():
         self.image = self.resize_image(self.image)
         
         if save:
-            self.image_save(file, output_dir='./no_ocr_binary')
+            self.image_save(file, output_dir='./output/no_OCR_make_gray')
         
     
     def run(self, save=False):
