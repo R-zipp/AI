@@ -23,13 +23,13 @@ def merge_images(folder1, folder2, output_folder):
         merged_img.paste(img2, (img1.width, 0))
 
         # 이미지 크기를 512x256으로 변경
-        resized_img = merged_img.resize((4096, 2048))
+        # resized_img = merged_img.resize((4096, 2048))
 
         # 결과 이미지 저장
-        resized_img.save(os.path.join(output_folder, filename))
+        merged_img.save(os.path.join(output_folder, filename))
 
 folder1_path = './a/' # 첫 번째 폴더 경로
 folder2_path = './b/' # 두 번째 폴더 경로
-output_folder_path = './change_image_2048/' # 출력 폴더 경로
+output_folder_path = './no_ocr_binary_jpg_1024/' # 출력 폴더 경로
 
 merge_images(folder1_path, folder2_path, output_folder_path)
