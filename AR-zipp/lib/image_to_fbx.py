@@ -31,8 +31,7 @@ class ImageToFBX():
                 break
 
         if response.status_code == 200:
-            time.sleep(0.5)
-        #     # Blend to fbx converter
+            # Blend to fbx converter
             blend_name = response.text.replace('"','')
             blend_path = f"statics/blend_file/{blend_name}"
 

@@ -10,7 +10,7 @@ HandToBlueprint/file_change/pytorch-hed-master/
 HandToBlueprint/torch_learning/pytorch-CycleGAN-and-pix2pix-master/
 
 # Ignore directory
-backup/etc/
+backup/
 Babylon/
 
 # Security

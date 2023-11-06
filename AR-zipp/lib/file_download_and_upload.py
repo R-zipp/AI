@@ -1,7 +1,8 @@
+from botocore.exceptions import NoCredentialsError
 from fastapi import HTTPException
 import json
 import boto3
-from botocore.exceptions import NoCredentialsError
+import requests
 
 
 with open('resources/secret.json', 'r') as file:
@@ -39,6 +40,22 @@ def save_file_in_S3(fbx_file_path):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Server error: {e}")
     
+
+def file_download_with_url(url, local_filename):
+    try:
+        response = requests.get(url, stream=True)
+
+        if response.status_code != 200:
+            raise HTTPException(status_code=400, detail="Could not download image")
+
+        with open(local_filename, 'wb') as file:
+            for chunk in response.iter_content(chunk_size=8192):
+                file.write(chunk)
+
+    except requests.RequestException as e:
+        raise HTTPException(status_code=400, detail=f"Requests exception: {e}")
+
+
 
 if __name__ == '__main__':
     fbx_file_path = 'statics/fbx_file/image_000_pre_join_all.fbx'
