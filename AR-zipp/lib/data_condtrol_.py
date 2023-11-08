@@ -1,9 +1,9 @@
 import cv2
 import os
 import numpy as np
-import detect
 import easyocr
 
+import lib.detect as detect
 
 
 class CreateDataset():
@@ -61,7 +61,7 @@ class CreateDataset():
         return gray_image_3channel
         
         
-    def get_blueprint(self, img, padding_percent=0.2):
+    def remake_padding(self, img, padding_percent=0.2):
         temp_img = img.copy()
         gray = cv2.cvtColor(temp_img,cv2.COLOR_BGR2GRAY)
         contour, c_img = detect.outer_contours(gray, temp_img, color=(255,0,0))
@@ -76,7 +76,7 @@ class CreateDataset():
         padding_width = int(width * padding_percent)
         padding_height = int(height * padding_percent)
 
-        blueprint_img = cv2.copyMakeBorder(rect,
+        padding_img = cv2.copyMakeBorder(rect,
                                         padding_height,
                                         padding_height,
                                         padding_width,
@@ -84,7 +84,7 @@ class CreateDataset():
                                         cv2.BORDER_CONSTANT,
                                         value=[255, 255, 255])
 
-        return blueprint_img
+        return padding_img
 
 
     def proportion_control(self, img, aspect_ratio=16/9):
@@ -120,7 +120,7 @@ class CreateDataset():
         return resized_image
     
         
-    def image_save(self, file_path, output_dir='./output', base_filename = 'image', index=0):
+    def image_save(self, file_path, output_dir='./output', same_name=False, base_filename='image', index=0):
         try:
             if not os.path.exists(output_dir):
                 os.makedirs(output_dir)
@@ -131,55 +131,75 @@ class CreateDataset():
         filename, extension = os.path.splitext(file_name)
         extension = '.png'
         
-        new_filename = f"{base_filename}_{index:04d}{extension}"
-        
-        while os.path.exists(os.path.join(output_dir, new_filename)):
-            index += 1
+        if not same_name:
             new_filename = f"{base_filename}_{index:04d}{extension}"
+            
+            while os.path.exists(os.path.join(output_dir, new_filename)):
+                index += 1
+                new_filename = f"{base_filename}_{index:04d}{extension}"
+        else:
+            new_filename = f"{filename}{extension}"
         
         print(f'>> Save image : {new_filename}')
-        cv2.imwrite(os.path.join(output_dir, new_filename), self.image)
+        
+        new_path = os.path.join(output_dir, new_filename)
+        cv2.imwrite(new_path, self.image)
+        
+        return new_path
     
     
-    def parameter_setting(self, limit=150, aspect_ratio = 3/2):
+    def parameter_setting(self, limit=150, aspect_ratio = 3/2, output_dir='./output', new_width=1024, padding_percent=0.2):
         self.limit = limit
         self.aspect_ratio = aspect_ratio
+        self.output_dir = output_dir
+        self.new_width = new_width
+        self.padding_percent = padding_percent
         
         
     def process(self, file, save):
         self.image = cv2.imread(file)
         cv2.imwrite('temp.PNG', self.image)
-        # self.image = self.make_binary(self.image, limit=self.limit)
-        # self.image = self.remove_text(self.image)
-        self.image = self.make_grayscale(self.image)
+        self.image = self.make_binary(self.image, limit=self.limit)
+        self.image = self.remove_text(self.image)
+        # self.image = self.make_grayscale(self.image)
         self.image = self.cutting_image(self.image)
 
-        self.image = self.get_blueprint(self.image)
+        self.image = self.remake_padding(self.image, padding_percent=self.padding_percent)
         self.image = self.proportion_control(self.image, aspect_ratio=self.aspect_ratio)
-        self.image = self.resize_image(self.image)
+        self.image = self.resize_image(self.image, new_width=self.new_width)
         
         if save:
-            self.image_save(file, output_dir='./output/no_OCR_make_gray')
-        
+            new_path = self.image_save(file, output_dir=self.output_dir, same_name=True)
+            
+            return new_path, self.image
+        else:
+            return None, self.image
     
     def run(self, save=False):
         if type(self.data)==str:
             file = self.data
-            self.process(file, save)
+            new_path, result_img = self.process(file, save)
                 
         elif type(self.data)==list:
             for file in self.data[:]:
-                self.process(file, save)
+                new_path, result_img = self.process(file, save)
+                
+        return new_path, result_img
                 
         
 
 if __name__ == '__main__':
     create_dataset = CreateDataset()
     
-    directory = 'data/raw_data'
-    file = 'data/raw_data/image_217.jpg'
+    directory = 'statics/Images/Original'
+    file = 'statics/Images/Original/image_000.jpg'
     
-    # create_dataset.data_load(file=file)
-    create_dataset.data_load(directory=directory)
-    create_dataset.parameter_setting(limit=130, aspect_ratio=1/1)
-    result = create_dataset.run(save=True)
+    create_dataset.data_load(file=file)
+    # create_dataset.data_load(directory=directory)
+    create_dataset.parameter_setting(
+                                    limit=130, 
+                                    aspect_ratio=1/1, 
+                                    output_dir='./statics/uploads',
+                                    new_width=800)
+    result_img = create_dataset.run(save=True)
+    

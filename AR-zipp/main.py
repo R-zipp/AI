@@ -54,6 +54,8 @@ async def download_and_return_fbx(image_url: ImageURL):
     
     
 
+
+
 @app.post("/spring/img_to_fbx_S3_test")
 async def download_and_return_fbx(image_url: ImageURL):
     # Validation
