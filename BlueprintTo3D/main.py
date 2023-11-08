@@ -12,14 +12,9 @@ app = FastAPI()
 bLueprint_to_3D = BLueprintTo3D()
 
 
+
 class Item(BaseModel):
     ImagePath: str
-
-
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
-
 
 @app.post("/blueprint_to_3D")
 async def create_user(item: Item):
@@ -37,24 +32,3 @@ async def create_user(item: Item):
 
     return f'{img_name}.blend'
 
-
-# @app.post("/uploadfile/")
-# async def create_upload_file(file: UploadFile = File(...)):
-#     # 업로드된 파일의 확장자 확인
-#     if not file.filename.lower().endswith((".jpg", ".jpeg", ".png")):
-#         raise HTTPException(status_code=400, detail="Invalid file format!")
-
-#     try:
-#         # 저장할 경로 설정
-#         file_path = Path(f"uploads/{file.filename}")
-
-#         # 파일 저장을 위한 준비
-#         with file_path.open("wb") as buffer:
-#             # 파일의 내용을 저장할 위치로 복사
-#             shutil.copyfileobj(file.file, buffer)
-
-#     finally:
-#         # 파일 닫기
-#         file.file.close()
-
-#     return {"filename": file.filename}
