@@ -45,15 +45,17 @@ class ImageToFBX():
 
     def image_to_fbx(self, file_path):
         # Preprocessing
-        create_dataset.data_load(file=file_path)
-        create_dataset.parameter_setting(
-                                        limit=110, 
-                                        aspect_ratio=1/1, 
-                                        output_dir='./statics/uploads',
-                                        new_width=800,
-                                        padding_percent=0.1)
-        preprocessing_result, result_img = create_dataset.run(save=True)
-
+        # create_dataset.data_load(file=file_path)
+        # create_dataset.parameter_setting(
+        #                                 limit=130, 
+        #                                 aspect_ratio=1/1, 
+        #                                 output_dir='./statics/uploads',
+        #                                 new_width=800,
+        #                                 padding_percent=0.1)
+        # preprocessing_result, result_img = create_dataset.run(save=True)
+        preprocessing_result = 'dfdfdfd.png'
+        file_path.save(preprocessing_result)
+        
         # Image to blend file
         url = 'http://127.0.0.1:8001/blueprint_to_3D'
 
@@ -62,18 +64,18 @@ class ImageToFBX():
         response = requests.post(url, json=data)
         print(f'Status Code: {response.status_code}  /  Response Content : {response.text}')
 
-        # Blend to fbx converter
-        if response.status_code == 200:
-            blend_name = response.text.replace('"','')
-            blend_path = f"statics/blend_file/{blend_name}"
+        # # Blend to fbx converter
+        # if response.status_code == 200:
+        #     blend_name = response.text.replace('"','')
+        #     blend_path = f"statics/blend_file/{blend_name}"
 
-            fbx_dir = 'statics/fbx_file'
-            fbx_file_path = converter.blend_to_fbx(blend_path, fbx_dir)
+        #     fbx_dir = 'statics/fbx_file'
+        #     fbx_file_path = converter.blend_to_fbx(blend_path, fbx_dir)
 
-            print('convert successfully!')
-            return fbx_file_path
-        else:
-            print(f'make bled error : {preprocessing_result}')
+        #     print('convert successfully!')
+        #     return fbx_file_path.replace('\\', '/')
+        # else:
+        #     print(f'make bled error : {preprocessing_result}')
 
 
 if __name__ == '__main__':

@@ -38,11 +38,13 @@ def merge_images(folder1, folder2, output_folder, idx):
 
 if __name__ == '__main__':
     data_list = ['cycle_0', 'cycle_1', 'cycle_2', 'cycle_3', 'cycle_4']
+    # data_list = ['cycle_0']
+    
     print('run!')
     for idx, name in enumerate(data_list):
-        folder1_path = f'./stable_diffusion/{name}/' # 첫 번째 폴더 경로
-        folder2_path = './target/' # 두 번째 폴더 경로
-        output_folder_path = './stable_diffusion_1024_v0/' # 출력 폴더 경로
+        folder1_path = './target/' # 두 번째 폴더 경로
+        folder2_path = f'./stable_diffusion/{name}/' # 첫 번째 폴더 경로
+        output_folder_path = './stable_diffusion_1108_v0/' # 출력 폴더 경로
 
         merge_images(folder1_path, folder2_path, output_folder_path, idx)
         print(f'{name} done')

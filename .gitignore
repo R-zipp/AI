@@ -12,6 +12,7 @@ HandToBlueprint/torch_learning/pytorch-CycleGAN-and-pix2pix-master/
 # Ignore directory
 backup/
 Babylon/
+AR-zipp/models
 
 # Security
 AR-zipp/resources

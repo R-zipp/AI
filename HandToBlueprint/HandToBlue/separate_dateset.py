@@ -3,7 +3,7 @@ import shutil
 from sklearn.model_selection import train_test_split
 
 # 데이터셋이 위치한 기본 폴더
-data_dir = 'stable_diffusion_1024_v0'
+data_dir = 'stable_diffusion_1108_v0'
 
 # 이미지 파일들의 리스트를 가져옵니다.
 file_list = os.listdir(data_dir)
