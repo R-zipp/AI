@@ -229,7 +229,9 @@ class BlueprintGenerator():
         if save:
             save_path = self.image_save(file, generated_image, add_origin=self.add_origin, output_dir=self.output_dir, default_name='gen_img')
         
-        return generated_image
+            return save_path, generated_image
+        else:
+            return None, generated_image
                 
 
     def parameter_setting(self, want_img='all', add_origin=False, output_dir='./output'):
@@ -245,14 +247,14 @@ class BlueprintGenerator():
             
         elif type(self.data) is list:
             for file in self.data[:]:
-                generated_image = self.process(file, save=save)
+                save_path, generated_image = self.process(file, save=save)
                 
         elif isinstance(self.data, Image.Image):
             file = self.data
-            generated_image = self.process(file, save=save)
+            save_path, generated_image = self.process(file, save=save)
                 
         print('Blueprint generate done')
-        return generated_image
+        return save_path, generated_image
 
 
 
@@ -267,8 +269,8 @@ if __name__ == '__main__':
     # image_array = np.array(image)
     
     # generator.data_load(file=file)
-    # generator.data_load(directory=directory)
-    generator.data_load(image=image)
+    generator.data_load(directory=directory)
+    # generator.data_load(image=image)
     generator.parameter_setting(
                                 want_img='all', 
                                 add_origin=True, 
