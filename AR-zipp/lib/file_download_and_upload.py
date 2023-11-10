@@ -3,6 +3,9 @@ from fastapi import HTTPException
 import json
 import boto3
 import requests
+from PIL import Image
+import numpy as np
+from io import BytesIO
 
 
 with open('resources/secret.json', 'r') as file:
@@ -41,16 +44,22 @@ def save_file_in_S3(fbx_file_path):
         raise HTTPException(status_code=500, detail=f"Server error: {e}")
     
 
-def file_download_with_url(url, local_filename):
+def file_download_with_url(url, save=False, local_filename=None):
     try:
         response = requests.get(url, stream=True)
 
         if response.status_code != 200:
             raise HTTPException(status_code=400, detail="Could not download image")
+        
+        image = Image.open(BytesIO(response.content))
 
-        with open(local_filename, 'wb') as file:
-            for chunk in response.iter_content(chunk_size=8192):
-                file.write(chunk)
+        if save or local_filename:
+            if save and local_filename:
+                image.save(local_filename)
+            else:
+                print("To save the image, both 'save' and 'local_filename' must be provided.")
+                
+        return image
 
     except requests.RequestException as e:
         raise HTTPException(status_code=400, detail=f"Requests exception: {e}")

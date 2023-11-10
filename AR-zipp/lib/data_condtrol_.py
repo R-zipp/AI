@@ -2,6 +2,7 @@ import cv2
 import os
 import numpy as np
 import easyocr
+from PIL import Image
 
 import lib.detect as detect
 
@@ -11,17 +12,6 @@ class CreateDataset():
         self.data = None
     
     
-    def data_load(self, directory=None, file=None):
-        if directory and file:
-            raise Exception("You must choose between a directory and a file.")
-        
-        if directory:
-            file_list = os.listdir(directory)
-            self.data = [os.path.join(directory, name) for name in file_list]
-        elif file:
-            self.data = file
-        
-        
     def remove_text(self, img):
         reader = easyocr.Reader(['ko','en'])
         results = reader.readtext(img)
@@ -122,13 +112,10 @@ class CreateDataset():
         
     def image_save(self, file_path, output_dir='./output', same_name=False, base_filename='image', index=0):
         try:
-            if not os.path.exists(output_dir):
-                os.makedirs(output_dir)
+            os.makedirs(output_dir, exist_ok=True)
         except OSError:
             print("Error: Failed to create the directory.")
         
-        file_name = sum([i.split('\\') for i in file_path.split('/')], [])[-1]
-        filename, extension = os.path.splitext(file_name)
         extension = '.png'
         
         if not same_name:
@@ -138,6 +125,8 @@ class CreateDataset():
                 index += 1
                 new_filename = f"{base_filename}_{index:04d}{extension}"
         else:
+            file_name = sum([i.split('\\') for i in file_path.split('/')], [])[-1]
+            filename, extension = os.path.splitext(file_name)
             new_filename = f"{filename}{extension}"
         
         print(f'>> Save image : {new_filename}')
@@ -146,18 +135,37 @@ class CreateDataset():
         cv2.imwrite(new_path, self.image)
         
         return new_path
+
     
+    def data_load(self, directory=None, file=None, image=None):
+        cnt = len([i for i in [directory, file, image] if i])
+        if cnt >= 2:
+            raise Exception("You must choose only one type")
+        
+        if directory:
+            file_list = os.listdir(directory)
+            self.data = [os.path.join(directory, name) for name in file_list]
+        elif file:
+            self.data = file
+        elif isinstance(image, Image.Image):
+            self.data = image
+
     
-    def parameter_setting(self, limit=150, aspect_ratio = 3/2, output_dir='./output', new_width=1024, padding_percent=0.2):
+    def parameter_setting(self, limit=150, aspect_ratio = 3/2, output_dir='./output', new_width=1024, padding_percent=0.2, same_name=False):
         self.limit = limit
         self.aspect_ratio = aspect_ratio
         self.output_dir = output_dir
         self.new_width = new_width
         self.padding_percent = padding_percent
+        self.same_name = same_name
         
         
-    def process(self, file, save):
-        self.image = cv2.imread(file)
+    def process(self, file, save=False):
+        if isinstance(self.data, Image.Image):
+            self.image = np.array(file)
+        else:
+            self.image = cv2.imread(file)
+
         cv2.imwrite('temp.PNG', self.image)
         self.image = self.make_binary(self.image, limit=self.limit)
         self.image = self.remove_text(self.image)
@@ -169,20 +177,28 @@ class CreateDataset():
         self.image = self.resize_image(self.image, new_width=self.new_width)
         
         if save:
-            new_path = self.image_save(file, output_dir=self.output_dir, same_name=True)
+            new_path = self.image_save(file, output_dir=self.output_dir, same_name=self.same_name)
             
             return new_path, self.image
         else:
             return None, self.image
     
+    
     def run(self, save=False):
         if type(self.data)==str:
             file = self.data
-            new_path, result_img = self.process(file, save)
+            new_path, result_img = self.process(file, save=save)
                 
         elif type(self.data)==list:
             for file in self.data[:]:
-                new_path, result_img = self.process(file, save)
+                new_path, result_img = self.process(file, save=save)
+                
+        elif isinstance(self.data, Image.Image):
+            file = self.data
+            new_path, result_img = self.process(file, save=save)
+            
+        else:
+            raise Exception('data type is wrong')
                 
         return new_path, result_img
                 
@@ -200,6 +216,7 @@ if __name__ == '__main__':
                                     limit=130, 
                                     aspect_ratio=1/1, 
                                     output_dir='./statics/uploads',
-                                    new_width=800)
+                                    new_width=800,
+                                    same_name=False)
     result_img = create_dataset.run(save=True)
     
