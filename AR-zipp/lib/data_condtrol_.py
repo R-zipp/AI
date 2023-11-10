@@ -200,6 +200,7 @@ class CreateDataset():
         else:
             raise Exception('data type is wrong')
                 
+        print('Preprocessing done')
         return new_path, result_img
                 
         
