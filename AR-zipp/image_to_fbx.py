@@ -1,5 +1,6 @@
-import os
+import json
 import requests
+from PIL import Image
 
 from lib.preprocessing import PreProcessing
 from lib.blend_to_fbx import BlendToFBX
@@ -64,13 +65,15 @@ class ImageToFBX():
         response = requests.post(url, json=data)
         print(f'Status Code: {response.status_code}  /  Response Content : {response.text}')
 
+        ItoB_result = json.loads(response.text)
+
         # Blend to fbx converter
         if response.status_code == 200:
-            blend_name = response.text.replace('"','')
-            blend_path = f"statics/blend_file/{blend_name}"
+            blend_path = f"statics/blend_file/{ItoB_result['blend_name']}"
 
+            size_multiplier = round(self.size / ItoB_result['size'], 1) if self.size else 1
             fbx_dir = 'statics/fbx_file'
-            fbx_file_path = converter.blend_to_fbx(blend_path, fbx_dir, size_multiplier=2, desired_height=2.5)
+            fbx_file_path = converter.blend_to_fbx(blend_path, fbx_dir, size_multiplier=size_multiplier, desired_height=2.5)
 
             print('convert successfully!')
             return fbx_file_path.replace('\\', '/')
@@ -86,8 +89,10 @@ class ImageToFBX():
                                         aspect_ratio=1/1, 
                                         output_dir='./statics/uploads',
                                         new_width=800,
-                                        padding_percent=0.1)
-        preprocessing_result, result_img = create_dataset.run(save=True)
+                                        padding_percent=0.15, 
+                                        output_name=self.name,
+                                        same_name=bool(self.name))
+        preprocessing_result, result_img = create_dataset.run(save=True)            
         
         # Image to blend file
         url = 'http://127.0.0.1:8001/blueprint_to_3D'
@@ -96,14 +101,16 @@ class ImageToFBX():
 
         response = requests.post(url, json=data)
         print(f'Status Code: {response.status_code}  /  Response Content : {response.text}')
+        
+        ItoB_result = json.loads(response.text)
 
         # Blend to fbx converter
         if response.status_code == 200:
-            blend_name = response.text.replace('"','')
-            blend_path = f"statics/blend_file/{blend_name}"
+            blend_path = f"statics/blend_file/{ItoB_result['blend_name']}"
 
+            size_multiplier = round(self.size / ItoB_result['size'], 1) if self.size else 1
             fbx_dir = 'statics/fbx_file'
-            fbx_file_path = converter.blend_to_fbx(blend_path, fbx_dir, size_multiplier=2, desired_height=2.5)
+            fbx_file_path = converter.blend_to_fbx(blend_path, fbx_dir, size_multiplier=size_multiplier, desired_height=2.0)
 
             print('convert successfully!')
             return fbx_file_path.replace('\\', '/')
@@ -111,7 +118,10 @@ class ImageToFBX():
             print(f'make bled error : {preprocessing_result}')
             
     
-    def run(self, img_type, image):
+    def run(self, img_type, image, name=None, size=None):
+        self.size = size
+        self.name = name
+        
         # mode select
         if img_type == 'HANDIMG':
             fbx_file = self.handimg_to_fbx(image)
@@ -127,7 +137,13 @@ if __name__ == '__main__':
     ItoFBX = ImageToFBX()
     
     img_type = ["HANDIMG", "FLOORPLAN"]
-    # ItoFBX.run(img_type[0], image)
+    
+    img_path = './statics/Images/Original/image_048.jpg'
+    name = img_path.split('/')[-1]
+    
+    image = Image.open(img_path)
+    
+    fbx_file = ItoFBX.run(img_type[1], image, name=name, size=50)
 
     # file = 'statics/Images/Original/image_000.jpg'
     # directory = 'statics/Images/Original'

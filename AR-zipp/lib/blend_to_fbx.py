@@ -46,7 +46,7 @@ class BlendToFBX():
         
         # print(obj.dimensions.x, obj.dimensions.y, obj.dimensions.z)
 
-        fbx_file = os.path.join(fbx_dir, f'{name}_join_s{size_multiplier}_h{desired_height}.fbx')
+        fbx_file = os.path.join(fbx_dir, f'{name}_s{size_multiplier}_h{desired_height}.fbx')
 
         fake_stdout = io.StringIO()
         with contextlib.redirect_stdout(fake_stdout):

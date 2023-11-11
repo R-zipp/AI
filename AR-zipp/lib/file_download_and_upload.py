@@ -68,4 +68,5 @@ def file_download_with_url(url, save=False, local_filename=None):
 
 if __name__ == '__main__':
     fbx_file_path = 'statics/fbx_file/image_000_pre_join_all.fbx'
-    save_file_in_S3(fbx_file_path)
+    img = 'temp.PNG'
+    save_file_in_S3(img)
