@@ -194,6 +194,15 @@ def create_new_floorplan_path(path):
     return res
 
 
+def create_floorplan_path_with_name(path, name):
+    folder_path = path + name + '/'
+    if os.path.exists(folder_path):
+        shutil.rmtree(folder_path)
+
+    os.makedirs(folder_path)
+    return folder_path
+    
+
 def get_current_path():
     """
     Get path to this programs path

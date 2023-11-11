@@ -9,6 +9,8 @@ from FloorplanToBlenderLib import (
 )
 from FloorplanToBlenderLib.floorplan import new_floorplan
 import configparser
+from calculate_floor_size import calculate_floor_size
+
 
 class BLueprintTo3D():
     def __init__(self):
@@ -28,7 +30,6 @@ class BLueprintTo3D():
 
 
     def make_blend(self, img_path):
-        self.floorplans = []
 
         print("")
         print("Creates blender project")
@@ -43,23 +44,17 @@ class BLueprintTo3D():
         with open(config_path, 'w') as configfile:
             config.write(configfile)
 
-        self.floorplans.append(new_floorplan(config_path))
+        floorplans = new_floorplan(config_path)
 
-        IO.clean_data_folder(self.data_folder)
-
-        if len(self.floorplans) > 1:
-            data_paths.append(execution.simple_single(f) for f in self.floorplans)
-        else:
-            data_paths = [execution.simple_single(self.floorplans[0])]
+        # IO.clean_data_folder(self.data_folder)
+        base_name, extension = os.path.splitext(img_path.split('/')[-1])
         print("")
+        data_paths = [execution.simple_single(floorplans, file_name=base_name)]
+        blender_project_path = create_blender_project.create_blender_project(data_paths, self.target_folder)
 
-        if isinstance(data_paths[0], list):
-            for paths in data_paths:
-                blender_project_path = create_blender_project.create_blender_project(paths, self.target_folder)
-        else:
-            blender_project_path = create_blender_project.create_blender_project(data_paths, self.target_folder)
-
-        return blender_project_path
+        area_size = calculate_floor_size(base_name)
+        
+        return blender_project_path, area_size
 
 
 if __name__ == "__main__":

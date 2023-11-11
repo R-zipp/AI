@@ -24,13 +24,15 @@ app.mount("/statics", StaticFiles(directory="statics"), name="statics")
 class ImageInfo(BaseModel):
     drawingType: str
     userDrawingImage: str
-    size: Optional[int] = None
+    houseSize: Optional[str] = None
 
 @app.post("/spring/img_to_fbx_S3")
 async def download_and_return_fbx(item: ImageInfo):
     img_type = item.drawingType
     url = item.userDrawingImage
-
+    houseSize = item.houseSize
+    print(f'houseSize : {houseSize}')
+    
     # Validation
     if not url:
         raise HTTPException(status_code=400, detail="URL is required")
@@ -53,7 +55,7 @@ async def download_and_return_fbx(item: ImageInfo):
     # try:
     print('Run main process!')
     
-    fbx_file = ItoFBX.run(img_type, image)
+    fbx_file = ItoFBX.run(img_type, image, name=file_name, size=50)
     file_url = save_file_in_S3(fbx_file)
         
     return JSONResponse(content={'URL': file_url})

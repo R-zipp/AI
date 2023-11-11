@@ -12,13 +12,16 @@ Copyright (C) 2022 Daniel Westberg
 """
 
 
-def simple_single(floorplan, show=True):
+def simple_single(floorplan, show=True, file_name=None):
     """
     Generate one simple floorplan
     @Param image_path path to image
     @Return path to generated files
     """
-    filepath, _ = generate.generate_all_files(floorplan, show)
+    if file_name:
+        filepath, _ = generate.generate_all_files(floorplan, show, name=file_name)
+    else:
+        filepath, _ = generate.generate_all_files(floorplan, show)
     return filepath
 
 

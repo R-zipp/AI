@@ -110,7 +110,7 @@ class CreateDataset():
         return resized_image
     
         
-    def image_save(self, file_path, output_dir='./output', same_name=False, base_filename='image', index=0):
+    def image_save(self, image, filename, output_dir='./output', same_name=False, index=0):
         try:
             os.makedirs(output_dir, exist_ok=True)
         except OSError:
@@ -119,20 +119,21 @@ class CreateDataset():
         extension = '.png'
         
         if not same_name:
-            new_filename = f"{base_filename}_{index:04d}{extension}"
+            filename = 'image'
+            new_filename = f"{filename}_{index:04d}{extension}"
             
             while os.path.exists(os.path.join(output_dir, new_filename)):
                 index += 1
-                new_filename = f"{base_filename}_{index:04d}{extension}"
+                new_filename = f"{filename}_{index:04d}{extension}"
         else:
-            file_name = sum([i.split('\\') for i in file_path.split('/')], [])[-1]
-            filename, extension = os.path.splitext(file_name)
+            # file_name = sum([i.split('\\') for i in file_path.split('/')], [])[-1]
+            filename, extension_ = os.path.splitext(filename)
             new_filename = f"{filename}{extension}"
         
         print(f'>> Save image : {new_filename}')
         
         new_path = os.path.join(output_dir, new_filename)
-        cv2.imwrite(new_path, self.image)
+        cv2.imwrite(new_path, image)
         
         return new_path
 
@@ -151,13 +152,20 @@ class CreateDataset():
             self.data = image
 
     
-    def parameter_setting(self, limit=150, aspect_ratio = 3/2, output_dir='./output', new_width=1024, padding_percent=0.2, same_name=False):
+    def parameter_setting(self, limit=150, 
+                          aspect_ratio = 3/2, 
+                          output_dir='./output', 
+                          new_width=1024, 
+                          padding_percent=0.2, 
+                          output_name='image',
+                          same_name=False):
         self.limit = limit
         self.aspect_ratio = aspect_ratio
         self.output_dir = output_dir
         self.new_width = new_width
         self.padding_percent = padding_percent
         self.same_name = same_name
+        self.output_name = output_name
         
         
     def process(self, file, save=False):
@@ -165,6 +173,7 @@ class CreateDataset():
             self.image = np.array(file)
         else:
             self.image = cv2.imread(file)
+            self.output_name = sum([i.split('\\') for i in file.split('/')], [])[-1]
 
         cv2.imwrite('temp.PNG', self.image)
         self.image = self.make_binary(self.image, limit=self.limit)
@@ -177,7 +186,7 @@ class CreateDataset():
         self.image = self.resize_image(self.image, new_width=self.new_width)
         
         if save:
-            new_path = self.image_save(file, output_dir=self.output_dir, same_name=self.same_name)
+            new_path = self.image_save(self.image, self.output_name, output_dir=self.output_dir, same_name=self.same_name)
             
             return new_path, self.image
         else:

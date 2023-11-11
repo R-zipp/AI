@@ -22,6 +22,7 @@ def generate_all_files(
     world_scale=np.array([1, 1, 1]),
     world_position=np.array([0, 0, 0]),
     world_rotation=np.array([0, 0, 0]),
+    name=None
 ):
     """
     Generate all data files
@@ -57,7 +58,10 @@ def generate_all_files(
         print("")
 
     # Get path to save data
-    path = IO.create_new_floorplan_path(const.BASE_PATH)
+    if name:
+        path = IO.create_floorplan_path_with_name(const.BASE_PATH, name)
+    else:
+        path = IO.create_new_floorplan_path(const.BASE_PATH)
 
     origin_path, shape = IO.find_reuseable_data(floorplan.image_path, const.BASE_PATH)
 
