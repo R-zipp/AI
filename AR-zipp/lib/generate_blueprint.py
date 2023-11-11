@@ -200,7 +200,8 @@ class BlueprintGenerator():
             
         else:
             raise Exception('File type is not correct!')
-            
+        
+        print(f'>> Save image : {output_path}')
         return output_path
 
 

@@ -31,7 +31,7 @@ async def download_and_return_fbx(item: ImageInfo):
     img_type = item.drawingType
     url = item.userDrawingImage
     houseSize = item.houseSize
-    print(f'houseSize : {houseSize}')
+    print(f'img_type : {img_type}, houseSize : {houseSize}')
     
     # Validation
     if not url:
@@ -52,15 +52,15 @@ async def download_and_return_fbx(item: ImageInfo):
     image = file_download_with_url(url, save=True ,local_filename=local_filename)
 
     # Main process
-    # try:
-    print('Run main process!')
-    
-    fbx_file = ItoFBX.run(img_type, image, name=file_name, size=50)
-    file_url = save_file_in_S3(fbx_file)
-        
-    return JSONResponse(content={'URL': file_url})
+    try:
+        print('Run main process!')
 
-    # except Exception as e:
-    #     raise HTTPException(status_code=500, detail=f"Server error: {e}")
+        fbx_file = ItoFBX.run(img_type, image, name=file_name, size=32*3.3)
+        file_url = save_file_in_S3(fbx_file)
+            
+        return JSONResponse(content={'URL': file_url})
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Server error: {e}")
     
     
