@@ -19,33 +19,6 @@ generator = BlueprintGenerator(model_path)
 class ImageToFBX():
     def __init__(self) -> None:
         pass
-
-    def image_to_fbx_old(self, file_path):
-        # Preprocessing
-        ouput_path = 'statics/Images/After_preprocessing'
-        preprocessing.run(file_path)
-        preprocessing_result = preprocessing.file_save(ouput_path)
-
-        # Image to blend file
-        url = 'http://127.0.0.1:8001/blueprint_to_3D'
-
-        data = {'ImagePath': preprocessing_result}
-
-        response = requests.post(url, json=data)
-        print(f'Status Code: {response.status_code}  /  Response Content : {response.text}')
-
-        if response.status_code == 200:
-            # Blend to fbx converter
-            blend_name = response.text.replace('"','')
-            blend_path = f"statics/blend_file/{blend_name}"
-
-            fbx_dir = 'statics/fbx_file'
-            fbx_file = converter.blend_to_fbx(blend_path, fbx_dir)
-
-            print('convert successfully!')
-            return fbx_file
-        else:
-            print(f'make bled error : {preprocessing_result}')
     
     
     def handimg_to_fbx(self, origin_image):
@@ -138,12 +111,13 @@ if __name__ == '__main__':
     
     img_type = ["HANDIMG", "FLOORPLAN"]
     
-    img_path = './statics/Images/Original/image_048.jpg'
+    # img_path = './statics/Images/Original/image_048.jpg'
+    img_path = './statics/Images/image_1171_(06).png'
     name = img_path.split('/')[-1]
     
     image = Image.open(img_path)
     
-    fbx_file = ItoFBX.run(img_type[1], image, name=name, size=50)
+    fbx_file = ItoFBX.run(img_type[0], image, name=name, size=100)
 
     # file = 'statics/Images/Original/image_000.jpg'
     # directory = 'statics/Images/Original'
