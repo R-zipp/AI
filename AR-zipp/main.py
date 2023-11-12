@@ -1,21 +1,22 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, File, UploadFile
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from urllib.parse import urlparse
 from pathlib import Path
 from typing import Optional
+from PIL import Image
+import io
 
 from lib.file_download_and_upload import save_file_in_S3, file_download_with_url
 from lib.generate_blueprint import BlueprintGenerator
 from image_to_fbx import ImageToFBX
+import lib.const as const
 
-
-model_path = "./models/G_no_ocr_binary_size1024_1109.pt"
 
 app = FastAPI()
 ItoFBX = ImageToFBX()
-generator = BlueprintGenerator(model_path)
+generator = BlueprintGenerator(const.MODEL_PATH)
 
 app.mount("/statics", StaticFiles(directory="statics"), name="statics")
 
@@ -48,8 +49,7 @@ async def download_and_return_fbx(item: ImageInfo):
         raise HTTPException(status_code=400, detail="Invalid image type, only HANDIMG, FLOORPLAN are allowed")
 
     # File download
-    local_filename = f'statics/uploads/{file_name}'
-    image = file_download_with_url(url, save=True ,local_filename=local_filename)
+    image = file_download_with_url(url, save=True ,filename=file_name)
 
     # Main process
     try:
@@ -63,13 +63,9 @@ async def download_and_return_fbx(item: ImageInfo):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Server error: {e}")
     
-    
-    
-from fastapi import FastAPI, File, UploadFile
-from PIL import Image
-import io
 
-    
+
+
 @app.post("/uploadfile/")
 async def create_upload_file(file: UploadFile = File(...)):
     img_type = ["HANDIMG", "FLOORPLAN"]
@@ -92,7 +88,3 @@ async def create_upload_file(file: UploadFile = File(...)):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Server error: {e}")
-    # You can now process the image using PIL methods
-    # For example, you could save it to a file, resize it, etc.
-    
-    return {"filename": file.filename, "image_size": image.size}

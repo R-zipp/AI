@@ -1,5 +1,4 @@
 import torchvision.transforms as transforms
-from torchvision.utils import save_image
 from PIL import Image
 import torch
 import torch.nn as nn
@@ -156,8 +155,9 @@ class BlueprintGenerator():
         return generated_image
 
 
-    def image_save(self, file, image, add_origin=False, output_dir='./output', default_name='gen_img'):
+    def image_save(self, file, image, add_origin=False, output_dir='./output', name='gen_img'):
         os.makedirs(output_dir, exist_ok=True)
+        name, extension = os.path.splitext(name)
         
         if type(file) is str: 
             name = file.split('/')[-1].split('\\')[-1]
@@ -194,8 +194,8 @@ class BlueprintGenerator():
                 new_image.paste(image, (width1, 0))
                 image = new_image.copy()
                 
-            extention = '.png'
-            output_path = os.path.join(output_dir, default_name+extention)
+            extention = '.png' if extension == '' else extension
+            output_path = os.path.join(output_dir, name+extention)
             image.save(output_path)
             
         else:
@@ -228,17 +228,18 @@ class BlueprintGenerator():
         generated_image = self.generate_image(image, want_img=self.want_img)
         
         if save:
-            save_path = self.image_save(file, generated_image, add_origin=self.add_origin, output_dir=self.output_dir, default_name='gen_img')
+            save_path = self.image_save(file, generated_image, add_origin=self.add_origin, output_dir=self.output_dir, name=self.output_name)
         
             return save_path, generated_image
         else:
             return None, generated_image
                 
 
-    def parameter_setting(self, want_img='all', add_origin=False, output_dir='./output'):
+    def parameter_setting(self, want_img='all', add_origin=False, output_dir='./output', output_name='gen_img'):
         self.add_origin = add_origin
         self.output_dir = output_dir
         self.want_img = want_img
+        self.output_name = output_name
         
         
     def run(self, save=False):
@@ -260,20 +261,28 @@ class BlueprintGenerator():
 
 
 if __name__ == '__main__':
-    model_path = "./models/G_no_ocr_binary_size1024_1109.pt"
+    model_path = "./models/20231108/G_no_ocr_binary_size1024_1109.pt"
+    # model_path = "./models/Best_saved_models/G_best_size1024.pt"
+    # model_path = "./models/saved_models_each_50epoch/G_size1024_350.pt"
     generator = BlueprintGenerator(model_path)
 
-    directory = 'statics/Images/cycle_6'
-    file = 'statics/Images/cycle_6/image_0_(06).png'
+    directory = 'statics/Images/SD_output_2/cycle_0'
+    file = 'statics/Images/SD_output_2/cycle_1/image_1014_(01).png'
     
     image = Image.open(file)
-    # image_array = np.array(image)
     
     # generator.data_load(file=file)
-    generator.data_load(directory=directory)
+    # generator.data_load(directory=directory)
     # generator.data_load(image=image)
+    # generator.parameter_setting(
+    #                             want_img='all', 
+    #                             add_origin=True, 
+    #                             output_dir='./output_2')
+    # result_img = generator.run(save=True)
+    
+    generator.data_load(image=image)
     generator.parameter_setting(
-                                want_img='all', 
-                                add_origin=True, 
-                                output_dir='./output_2')
-    result_img = generator.run(save=True)
+                            want_img='all', 
+                            add_origin=True, 
+                            output_dir='./statics/generate_img')
+    generating_result, result_img = generator.run(save=True)

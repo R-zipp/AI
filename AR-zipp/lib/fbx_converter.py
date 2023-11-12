@@ -3,10 +3,41 @@ import os
 import io
 import contextlib
 
+import lib.const as const
+
 
 class BlendToFBX():
     def __init__(self) -> None:
-        pass
+        self.default_path = const.TEXTURE_FILE_PATH
+
+
+    def texture_loader(self, texture_name):
+        
+        texture_list = os.listdir(os.path.join(self.default_path, texture_name))
+        
+        texture_paths = {}
+        for texture in texture_list:
+            if 'Albedo' in texture:
+                texture_paths['albedo'] = f'{self.default_path}{texture_name}/{texture}'
+            if 'ao' in texture:
+                texture_paths['ao'] = f'{self.default_path}{texture_name}/{texture}'
+            if 'displacement' in texture:
+                texture_paths['displacement'] = f'{self.default_path}{texture_name}/{texture}'
+            if 'normal' in texture:
+                texture_paths['normal'] = f'{self.default_path}{texture_name}/{texture}'
+            if 'roughness' in texture:
+                texture_paths['roughness'] = f'{self.default_path}{texture_name}/{texture}'
+        
+        return texture_paths
+
+
+    def create_white_material(self, material_name="WhiteMaterial"):
+        mat = bpy.data.materials.new(name=material_name)
+        mat.use_nodes = True
+        nodes = mat.node_tree.nodes
+        bsdf = nodes.get('Principled BSDF')
+        bsdf.inputs['Base Color'].default_value = (1.0, 1.0, 1.0, 1.0)  # RGBA 값 (흰색)
+        return mat
 
 
     def create_detailed_material(self, texture_paths, material_name="DetailedMaterial", tiling_factor=(2, 2)):
@@ -50,7 +81,6 @@ class BlendToFBX():
         return mat
 
 
-
     def apply_shared_material(self, obj, shared_material):
         if obj.data.materials:
             obj.data.materials[0] = shared_material
@@ -58,7 +88,37 @@ class BlendToFBX():
             obj.data.materials.append(shared_material)
 
 
-    def blend_to_fbx(self, blend_file, fbx_dir, size_multiplier=1, desired_height=1):
+    def scale_change(self, obj):
+        # Reset the scale
+        obj.scale = (1, 1, 1)
+
+        # Apply the scale
+        bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
+        
+        # Apply new dimensions
+        new_dimensions = [obj.dimensions.x*self.size_multiplier, obj.dimensions.y*self.size_multiplier, self.desired_height]
+        obj.dimensions = new_dimensions
+        
+    
+    def triangulate_object(self, obj):
+        bpy.context.view_layer.objects.active = obj
+        bpy.ops.object.mode_set(mode='EDIT')
+        bpy.ops.mesh.select_all(action='SELECT')
+        bpy.ops.mesh.quads_convert_to_tris()
+        bpy.ops.object.mode_set(mode='OBJECT')
+        
+        
+    def postprocessing(self, obj):
+        # Auto UV Mapping
+        bpy.ops.object.mode_set(mode='EDIT')
+        bpy.ops.mesh.select_all(action='SELECT')
+        bpy.ops.uv.smart_project()
+        bpy.ops.object.mode_set(mode='OBJECT')
+        
+        
+    def blend_to_fbx(self, blend_file, fbx_dir, texture_name=None, size_multiplier=1, desired_height=1):
+        self.size_multiplier = size_multiplier
+        self.desired_height = desired_height
 
         os.makedirs(fbx_dir, exist_ok=True)
         name, extension = blend_file.split("/")[-1].split(".")
@@ -66,14 +126,11 @@ class BlendToFBX():
         bpy.ops.wm.open_mainfile(filepath=blend_file)
         bpy.ops.object.select_all(action='DESELECT')
 
-        texture_paths = {
-                        'albedo': 'D:/workspace/Final_Project/AR-zipp/texture/plaster_damaged_xevjddns/xevjddns_8K_Albedo.jpg',
-                        'ao': 'D:/workspace/Final_Project/AR-zipp/texture/plaster_damaged_xevjddns/xevjddns_8K_AO.jpg',
-                        'displacement': 'D:/workspace/Final_Project/AR-zipp/texture/plaster_damaged_xevjddns/xevjddns_8K_Displacement.jpg',
-                        'normal': 'D:/workspace/Final_Project/AR-zipp/texture/plaster_damaged_xevjddns/xevjddns_8K_Normal.jpg',
-                        'roughness': 'D:/workspace/Final_Project/AR-zipp/texture/plaster_damaged_xevjddns/xevjddns_8K_Roughness.jpg'
-                        }
-        detailed_material = self.create_detailed_material(texture_paths, tiling_factor=(0.1, 0.1))
+        if texture_name:
+            texture_paths = self.texture_loader(texture_name)
+            detailed_material = self.create_detailed_material(texture_paths, tiling_factor=(0.1, 0.1))
+        else:
+            detailed_material = self.create_white_material()
         
         # Mesh objects
         MSH_OBJS = [m for m in bpy.context.scene.objects if m.type == 'MESH']
@@ -83,7 +140,6 @@ class BlendToFBX():
             bpy.context.view_layer.objects.active = OBJS
 
             if 'Wall' in OBJS.name and 'Box' in OBJS.name:
-                print(OBJS.name)
                 self.apply_shared_material(OBJS, detailed_material)
 
         # Joins objects
@@ -92,27 +148,14 @@ class BlendToFBX():
         # Get the current active object
         obj = bpy.context.object
 
-        # Reset the scale
-        obj.scale = (1, 1, 1)
-
-        # Apply the scale
-        bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
+        self.scale_change(obj)
         
-        # Apply new dimensions
-        new_dimensions = [obj.dimensions.x*size_multiplier, obj.dimensions.y*size_multiplier, desired_height]
-        obj.dimensions = new_dimensions
-        
-        # Auto UV Mapping
-        bpy.ops.object.mode_set(mode='EDIT')
-        bpy.ops.mesh.select_all(action='SELECT')
-        bpy.ops.uv.smart_project()
-        bpy.ops.object.mode_set(mode='OBJECT')
+        self.postprocessing(obj)
 
         # add triangulate 
         self.triangulate_object(obj)
 
         fbx_file = os.path.join(fbx_dir, f'{name}_s{size_multiplier}_h{desired_height}.fbx')
-
         with contextlib.redirect_stdout(io.StringIO()):
             bpy.ops.export_scene.fbx(
                                         filepath=fbx_file,
