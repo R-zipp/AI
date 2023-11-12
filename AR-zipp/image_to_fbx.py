@@ -27,7 +27,7 @@ class ImageToFBX():
         generator.parameter_setting(
                                 want_img='all', 
                                 add_origin=False, 
-                                output_dir='./statics/generate_reault')
+                                output_dir='./statics/generate_img')
         generating_result, result_img = generator.run(save=True)
         
         # Image to blend file
@@ -60,8 +60,8 @@ class ImageToFBX():
         create_dataset.parameter_setting(
                                         limit=130, 
                                         aspect_ratio=1/1, 
-                                        output_dir='./statics/uploads',
-                                        new_width=800,
+                                        output_dir='./statics/preprocessing_img',
+                                        new_width=700,
                                         padding_percent=0.15, 
                                         output_name=self.name,
                                         same_name=bool(self.name))
@@ -111,8 +111,9 @@ if __name__ == '__main__':
     
     img_type = ["HANDIMG", "FLOORPLAN"]
     
-    # img_path = './statics/Images/Original/image_048.jpg'
-    img_path = './statics/Images/image_1171_(06).png'
+    # img_path = './statics/Images/Original/image_162.jpg'
+    img_path = './statics/KakaoTalk_20231112_163329922.jpg'
+    # img_path = './statics/Images/image_1171_(06).png'
     name = img_path.split('/')[-1]
     
     image = Image.open(img_path)
