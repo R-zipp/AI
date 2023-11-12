@@ -64,3 +64,35 @@ async def download_and_return_fbx(item: ImageInfo):
         raise HTTPException(status_code=500, detail=f"Server error: {e}")
     
     
+    
+from fastapi import FastAPI, File, UploadFile
+from PIL import Image
+import io
+
+    
+@app.post("/uploadfile/")
+async def create_upload_file(file: UploadFile = File(...)):
+    img_type = ["HANDIMG", "FLOORPLAN"]
+    # Read the contents of the uploaded file
+    contents = await file.read()
+
+    # Convert the contents to a BytesIO object
+    image_stream = io.BytesIO(contents)
+
+    # Open the image using PIL
+    image = Image.open(image_stream)
+
+    try:
+        print('Run main process!')
+
+        fbx_file = ItoFBX.run(img_type[0], image, name='test.png', size=32*3.3)
+        file_url = save_file_in_S3(fbx_file)
+            
+        return JSONResponse(content={'URL': file_url})
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Server error: {e}")
+    # You can now process the image using PIL methods
+    # For example, you could save it to a file, resize it, etc.
+    
+    return {"filename": file.filename, "image_size": image.size}
