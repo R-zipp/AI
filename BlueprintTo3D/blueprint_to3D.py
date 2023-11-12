@@ -30,7 +30,6 @@ class BLueprintTo3D():
 
 
     def make_blend(self, img_path):
-
         print("")
         print("Creates blender project")
         print("")

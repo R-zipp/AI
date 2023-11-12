@@ -9,7 +9,7 @@ Copyright (C) 2022 Daniel Westberg
 """
 
 
-def figlet(text="BLueprint To 3D", font="slant"):
+def figlet(text="BLueprint To Blend", font="slant"):
     f = Figlet(font=font)
     print(f.renderText(text))
 

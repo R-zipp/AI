@@ -175,7 +175,7 @@ class CreateDataset():
             self.image = cv2.imread(file)
             self.output_name = sum([i.split('\\') for i in file.split('/')], [])[-1]
 
-        cv2.imwrite('temp.PNG', self.image)
+        # cv2.imwrite('temp.PNG', self.image)
         self.image = self.make_binary(self.image, limit=self.limit)
         self.image = self.remove_text(self.image)
         # self.image = self.make_grayscale(self.image)
