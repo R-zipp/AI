@@ -235,11 +235,12 @@ class BlueprintGenerator():
             return None, generated_image
                 
 
-    def parameter_setting(self, want_img='all', add_origin=False, output_dir='./output', output_name='gen_img'):
+    def parameter_setting(self, want_img='all', add_origin=False, output_dir='./output', new_width=1024, output_name='gen_img'):
         self.add_origin = add_origin
         self.output_dir = output_dir
         self.want_img = want_img
         self.output_name = output_name
+        self.new_width = new_width
         
         
     def run(self, save=False):

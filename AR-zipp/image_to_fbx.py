@@ -25,7 +25,8 @@ class ImageToFBX():
                                 want_img='all', 
                                 add_origin=False, 
                                 output_dir='./statics/generate_img',
-                                output_name=self.name)
+                                output_name=self.name,
+                                new_width=700)
         generating_result, result_img = generator.run(save=True)
         
         return generating_result, result_img
@@ -65,9 +66,10 @@ class ImageToFBX():
             fbx_file_path = converter.blend_to_fbx(
                                                     blend_path, 
                                                     fbx_dir, 
-                                                    texture_name='plaster_4k_', 
+                                                    texture_name='plaster_2K', 
                                                     size_multiplier=size_multiplier, 
-                                                    desired_height=3
+                                                    desired_height=3,
+                                                    tiling_factor=(0.1, 0.1)
                                                     ).replace('\\', '/')
 
             print(f'convert successfully!   >> {fbx_file_path}')
@@ -97,12 +99,13 @@ if __name__ == '__main__':
     ItoFBX = ImageToFBX()
     
     img_type = ["HANDIMG", "FLOORPLAN"]
-    
+
     # img_path = './statics/Images/Original/image_038.jpg'
-    img_path = 'statics/Images/SD_output_2/cycle_1/image_1130_(01).png'
+    # img_path = 'statics/Images/SD_output_2/cycle_1/image_1130_(01).png'
+    img_path = 'statics/Images/SD_output_2/cycle_1/image_1147_(01).png'
     # img_path = './statics/Images/image_1171_(06).png'
     name = img_path.split('/')[-1]
     
     image = Image.open(img_path)
     
-    fbx_file = ItoFBX.run(img_type[0], image, name=name, size=26*3.3)
+    fbx_file = ItoFBX.run(img_type[0], image, name=name, size=32*3.3)
