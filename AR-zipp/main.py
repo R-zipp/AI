@@ -55,7 +55,7 @@ async def download_and_return_fbx(item: ImageInfo):
     try:
         print('Run main process!')
 
-        fbx_file = ItoFBX.run(img_type, image, name=file_name, size=32*3.3)
+        fbx_file = ItoFBX.run(img_type, image, name=file_name, size=int(houseSize)*3.3)
         file_url = save_file_in_S3(fbx_file)
             
         return JSONResponse(content={'URL': file_url})

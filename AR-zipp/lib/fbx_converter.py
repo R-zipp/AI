@@ -1,7 +1,9 @@
 import bpy
 import os
 import io
+import math
 import contextlib
+from mathutils import Vector
 
 import lib.const as const
 
@@ -47,6 +49,7 @@ class BlendToFBX():
 
         bsdf = nodes.get('Principled BSDF')
 
+        mapping_nodes = {}
         for texture_type, path in texture_paths.items():
             tex_image = nodes.new('ShaderNodeTexImage')
             tex_image.image = bpy.data.images.load(path)
@@ -77,8 +80,10 @@ class BlendToFBX():
                 links.new(normal_map.outputs['Normal'], bsdf.inputs['Normal'])
             elif texture_type == 'roughness':
                 links.new(tex_image.outputs['Color'], bsdf.inputs['Roughness'])
+                
+            mapping_nodes[texture_type] = mapping
 
-        return mat
+        return mat, mapping_nodes
 
 
     def apply_shared_material(self, obj, shared_material):
@@ -115,8 +120,32 @@ class BlendToFBX():
         bpy.ops.uv.smart_project()
         bpy.ops.object.mode_set(mode='OBJECT')
         
+    
+    def is_horizontal(self, obj):
+        bbox = [obj.matrix_world @ Vector(corner) for corner in obj.bound_box]
         
-    def blend_to_fbx(self, blend_file, fbx_dir, texture_name=None, size_multiplier=1, desired_height=1):
+        width = max(bbox, key=lambda v: v.x).x - min(bbox, key=lambda v: v.x).x
+        height = max(bbox, key=lambda v: v.y).y - min(bbox, key=lambda v: v.y).y
+        depth = max(bbox, key=lambda v: v.z).z - min(bbox, key=lambda v: v.z).z
+        # print(f'width : {width}, height : {height}, depth : {depth}')
+        
+        return max([width, height]) > depth
+
+    
+    def create_rotated_material(self, base_material, rotation_angle):
+        # 기본 재질 복제
+        rotated_material = base_material.copy()
+        rotated_material.name = base_material.name + "_rotated"
+
+        # 모든 mapping 노드를 회전
+        for node in rotated_material.node_tree.nodes:
+            if node.type == 'MAPPING':
+                node.inputs['Rotation'].default_value[2] = rotation_angle
+
+        return rotated_material
+    
+    
+    def blend_to_fbx(self, blend_file, fbx_dir, texture_name=None, size_multiplier=1, desired_height=1, tiling_factor=(1, 1)):
         self.size_multiplier = size_multiplier
         self.desired_height = desired_height
 
@@ -128,10 +157,13 @@ class BlendToFBX():
 
         if texture_name:
             texture_paths = self.texture_loader(texture_name)
-            detailed_material = self.create_detailed_material(texture_paths, tiling_factor=(0.1, 0.1))
+            detailed_material, mapping_nodes = self.create_detailed_material(texture_paths, tiling_factor=tiling_factor)
+            detailed_material_rotated = self.create_rotated_material(detailed_material, math.radians(90))
         else:
             detailed_material = self.create_white_material()
-        
+            mapping_nodes = {}
+        white_material = self.create_white_material()
+
         # Mesh objects
         MSH_OBJS = [m for m in bpy.context.scene.objects if m.type == 'MESH']
 
@@ -140,7 +172,13 @@ class BlendToFBX():
             bpy.context.view_layer.objects.active = OBJS
 
             if 'Wall' in OBJS.name and 'Box' in OBJS.name:
-                self.apply_shared_material(OBJS, detailed_material)
+                # self.apply_shared_material(OBJS, detailed_material)
+                if self.is_horizontal(OBJS):
+                    self.apply_shared_material(OBJS, detailed_material_rotated)
+                else:
+                    self.apply_shared_material(OBJS, detailed_material)
+            if 'VertWalls' in OBJS.name:
+                self.apply_shared_material(OBJS, white_material)
 
         # Joins objects
         bpy.ops.object.join()
@@ -155,7 +193,7 @@ class BlendToFBX():
         # add triangulate 
         self.triangulate_object(obj)
 
-        fbx_file = os.path.join(fbx_dir, f'{name}_s{size_multiplier}_h{desired_height}.fbx')
+        fbx_file = os.path.join(fbx_dir, f'{name}_s{size_multiplier}_h{desired_height}_{texture_name}.fbx')
         with contextlib.redirect_stdout(io.StringIO()):
             bpy.ops.export_scene.fbx(
                                         filepath=fbx_file,

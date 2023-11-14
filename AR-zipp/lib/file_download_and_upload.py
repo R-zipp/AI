@@ -56,7 +56,7 @@ def file_download_with_url(url, save=False, filename=None):
 
         if save or filename:
             if save and filename:
-                os.makedirs(const.DOWNLOAD_PATH)
+                os.makedirs(const.DOWNLOAD_PATH, exist_ok=True)
                 image.save(os.path.join(const.DOWNLOAD_PATH, filename))
             else:
                 print("To save the image, both 'save' and 'local_filename' must be provided.")
