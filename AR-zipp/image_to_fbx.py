@@ -1,6 +1,8 @@
 import json
 import requests
 from PIL import Image
+import os
+import subprocess
 
 from lib.data_condtrol import CreateDataset
 from lib.generate_blueprint import BlueprintGenerator
@@ -13,6 +15,7 @@ preprocessing = CreateDataset()
 generator = BlueprintGenerator(const.MODEL_PATH)
 
 
+    
 class ImageToFBX():
     def __init__(self):
         self.url = const.BLUEPRINT_TO_BLEND_SERVER_URL
@@ -76,8 +79,50 @@ class ImageToFBX():
             return fbx_file_path
         else:
             print(f'make bled error : {preprocessing_result}')
+            
     
+    def bpy_subprocess(self, blend_path, size_multiplier):
+        blender_script = './lib/fbx_converter.py'
+        
+        os.environ['BLEND_PATH'] = blend_path
+        os.environ['SIZE_MULTIPLIER'] = str(size_multiplier)
+        
+        blender_command = [
+                            'C:/Program Files/Blender Foundation/Blender 3.6/blender.exe',
+                            '-b',
+                            '--python', blender_script
+                            ]
+        
+        process = subprocess.run(blender_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        
+        # print(process.stdout.decode())
+        # print("STDERR:", process.stderr.decode())
+        return process.stdout.decode().split('\n')[0]
+                        
     
+    def process_test(self, preprocessing_result):
+        # blueprint to blend file
+        data = {'ImagePath': preprocessing_result}
+        response = requests.post(self.url, json=data)
+        
+        print(f'Status Code: {response.status_code}')
+        print(f'Response Content : {response.text}')
+        
+        # Blend to fbx converter
+        if response.status_code == 200:
+            BtoB_result = json.loads(response.text)
+            blend_path = f"statics/blend_file/{BtoB_result['blend_name']}"
+            size_multiplier = round(self.size / BtoB_result['size'], 1) if self.size else 1
+            
+            fbx_file_path = self.bpy_subprocess(blend_path, size_multiplier)
+            
+
+            print(f'convert successfully!   >> {fbx_file_path}')
+            return fbx_file_path
+        else:
+            print(f'make bled error : {preprocessing_result}')
+            
+            
     def run(self, img_type, image, name=None, size=None):
         self.size = size
         self.name = name
@@ -85,11 +130,11 @@ class ImageToFBX():
         # mode select
         if img_type == 'HANDIMG':
             preprocessing_result, result_img = self.handimg_to_fbx(image)
-            fbx_file = self.process(preprocessing_result)
+            fbx_file = self.process_test(preprocessing_result)
             
         elif img_type == 'FLOORPLAN':
             preprocessing_result, result_img = self.blueprint_to_fbx(image)
-            fbx_file = self.process(preprocessing_result)
+            fbx_file = self.process_test(preprocessing_result)
             
         return fbx_file
 
@@ -99,13 +144,15 @@ if __name__ == '__main__':
     ItoFBX = ImageToFBX()
     
     img_type = ["HANDIMG", "FLOORPLAN"]
+    
+    # img_path = 'statics/Images/SD_output_2/cycle_1/image_1147_(01).png'
+    # name = img_path.split('/')[-1]
 
-    # img_path = './statics/Images/Original/image_038.jpg'
-    # img_path = 'statics/Images/SD_output_2/cycle_1/image_1130_(01).png'
-    img_path = 'statics/Images/SD_output_2/cycle_1/image_1147_(01).png'
-    # img_path = './statics/Images/image_1171_(06).png'
-    name = img_path.split('/')[-1]
+    img_dir = 'statics/Images/Original'
+    img_list = os.listdir(img_dir)
+    for img_name in img_list[:10]:
+        name = img_name
     
-    image = Image.open(img_path)
+        image = Image.open(os.path.join(img_dir, img_name))
     
-    fbx_file = ItoFBX.run(img_type[0], image, name=name, size=32*3.3)
+        fbx_file = ItoFBX.run(img_type[1], image, name=name, size=32*3.3)

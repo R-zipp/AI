@@ -5,12 +5,17 @@ import math
 import contextlib
 from mathutils import Vector
 
+import sys
+sys.path.append('D:/workspace/Final_Project/AR-zipp')
+
 import lib.const as const
 
 
 class BlendToFBX():
     def __init__(self) -> None:
         self.default_path = const.TEXTURE_FILE_PATH
+        self.desired_height = const.DESIRED_HEIGHT
+        self.tiling_factor = const.TILING_FACTOR
 
 
     def texture_loader(self, texture_name):
@@ -42,7 +47,7 @@ class BlendToFBX():
         return mat
 
 
-    def create_detailed_material(self, texture_paths, material_name="DetailedMaterial", tiling_factor=(2, 2)):
+    def create_detailed_material(self, texture_paths, material_name="DetailedMaterial"):
         mat = bpy.data.materials.new(name=material_name)
         mat.use_nodes = True
         nodes = mat.node_tree.nodes
@@ -56,7 +61,7 @@ class BlendToFBX():
 
             mapping = nodes.new('ShaderNodeMapping')
             mapping.vector_type = 'TEXTURE'
-            mapping.inputs['Scale'].default_value = (tiling_factor[0], tiling_factor[1], 1)
+            mapping.inputs['Scale'].default_value = (self.tiling_factor[0], self.tiling_factor[1], 1)
 
             texCoord = nodes.new('ShaderNodeTexCoord')
 
@@ -112,14 +117,6 @@ class BlendToFBX():
         bpy.ops.mesh.quads_convert_to_tris()
         bpy.ops.object.mode_set(mode='OBJECT')
         
-        
-    def postprocessing(self, obj):
-        # Auto UV Mapping
-        bpy.ops.object.mode_set(mode='EDIT')
-        bpy.ops.mesh.select_all(action='SELECT')
-        bpy.ops.uv.smart_project()
-        bpy.ops.object.mode_set(mode='OBJECT')
-        
     
     def is_horizontal(self, obj):
         bbox = [obj.matrix_world @ Vector(corner) for corner in obj.bound_box]
@@ -145,9 +142,16 @@ class BlendToFBX():
         return rotated_material
     
     
-    def blend_to_fbx(self, blend_file, fbx_dir, texture_name=None, size_multiplier=1, desired_height=1, tiling_factor=(1, 1)):
+    def postprocessing(self, obj):
+        # Auto UV Mapping
+        bpy.ops.object.mode_set(mode='EDIT')
+        bpy.ops.mesh.select_all(action='SELECT')
+        bpy.ops.uv.smart_project()
+        bpy.ops.object.mode_set(mode='OBJECT')
+    
+    
+    def blend_to_fbx(self, blend_file, fbx_dir, texture_name=None, size_multiplier=1):
         self.size_multiplier = size_multiplier
-        self.desired_height = desired_height
 
         os.makedirs(fbx_dir, exist_ok=True)
         name, extension = blend_file.split("/")[-1].split(".")
@@ -157,7 +161,7 @@ class BlendToFBX():
 
         if texture_name:
             texture_paths = self.texture_loader(texture_name)
-            detailed_material, mapping_nodes = self.create_detailed_material(texture_paths, tiling_factor=tiling_factor)
+            detailed_material, mapping_nodes = self.create_detailed_material(texture_paths)
             detailed_material_rotated = self.create_rotated_material(detailed_material, math.radians(90))
         else:
             detailed_material = self.create_white_material()
@@ -193,7 +197,7 @@ class BlendToFBX():
         # add triangulate 
         self.triangulate_object(obj)
 
-        fbx_file = os.path.join(fbx_dir, f'{name}_s{size_multiplier}_h{desired_height}_{texture_name}.fbx')
+        fbx_file = os.path.join(fbx_dir, f'{name}_s{size_multiplier}_h{self.desired_height}_{texture_name}.fbx')
         with contextlib.redirect_stdout(io.StringIO()):
             bpy.ops.export_scene.fbx(
                                         filepath=fbx_file,
@@ -218,8 +222,16 @@ class BlendToFBX():
 
 
 if __name__ == '__main__':
-    blend_file = 'statics/blend_file/floorplan30.blend'
-    fbx_dir = 'statics/fbx_file'
-
     converter = BlendToFBX()
-    converter.blend_to_fbx(blend_file, fbx_dir)
+    
+    blend_path = os.environ.get('BLEND_PATH', 'default')
+    size_multiplier = os.environ.get('SIZE_MULTIPLIER', 'default')
+    
+    fbx_dir = 'statics/test'
+    fbx_file_path = converter.blend_to_fbx(
+                                            blend_path, 
+                                            fbx_dir, 
+                                            texture_name='plaster_2K', 
+                                            size_multiplier=float(size_multiplier), 
+                                            ).replace('\\', '/')
+    print(fbx_file_path)
