@@ -12,6 +12,7 @@ from lib.file_download_and_upload import save_file_in_S3, file_download_with_url
 from lib.generate_blueprint import BlueprintGenerator
 from image_to_fbx import ImageToFBX
 import lib.const as const
+import lib.dialog as dialog
 
 
 app = FastAPI()
@@ -20,7 +21,8 @@ generator = BlueprintGenerator(const.MODEL_PATH)
 
 app.mount("/statics", StaticFiles(directory="statics"), name="statics")
 
-
+dialog.figlet()
+dialog.init()
 
 class ImageInfo(BaseModel):
     drawingType: str
