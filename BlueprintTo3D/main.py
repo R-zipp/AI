@@ -22,6 +22,7 @@ async def create_user(item: Item):
     img_name, extension = os.path.splitext(img_path.split('/')[-1])
     output_path = f'../AR-zipp/statics/blend_file/{img_name}.blend'
 
+    print(img_path)
     project_path, area_size = bLueprint_to_3D.make_blend(img_path)
     shutil.copy(project_path, output_path)
 

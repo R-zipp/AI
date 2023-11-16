@@ -6,9 +6,11 @@ import contextlib
 from mathutils import Vector
 
 import sys
-sys.path.append('D:/workspace/Final_Project/AR-zipp')
+current_script_path = os.path.realpath(__file__)
+current_directory = os.path.dirname(current_script_path)
+sys.path.append(current_directory)
 
-import lib.const as const
+import const
 
 
 class BlendToFBX():
