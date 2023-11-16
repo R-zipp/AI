@@ -1,4 +1,3 @@
-from botocore.exceptions import NoCredentialsError
 from fastapi import HTTPException
 import json
 import boto3
@@ -6,8 +5,9 @@ import requests
 import os
 from PIL import Image
 from io import BytesIO
+from botocore.exceptions import NoCredentialsError
 
-import lib.const as const
+import const as const
 
 
 with open('resources/security/secret.json', 'r') as file:
