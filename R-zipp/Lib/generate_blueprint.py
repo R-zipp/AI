@@ -47,22 +47,25 @@ class GeneratorUNet(nn.Module):
         super(GeneratorUNet, self).__init__()
 
         self.down1 = UNetDown(in_channels, 64, normalize=False) # 출력: [64 X 128 X 128]
+
         self.down2 = UNetDown(64, 128) # 출력: [128 X 64 X 64]
         self.down3 = UNetDown(128, 256) # 출력: [256 X 32 X 32]
         self.down4 = UNetDown(256, 512, dropout=0.5) # 출력: [512 X 16 X 16]
         self.down5 = UNetDown(512, 512, dropout=0.5) # 출력: [512 X 8 X 8]
         self.down6 = UNetDown(512, 512, dropout=0.5) # 출력: [512 X 4 X 4]
         self.down7 = UNetDown(512, 512, dropout=0.5) # 출력: [512 X 2 X 2]
-        self.down8 = UNetDown(512, 512, normalize=False, dropout=0.5) # 출력: [512 X 1 X 1]
+        self.down8 = UNetDown(512, 512, dropout=0.5) # 출력: [512 X 2 X 2]
+        self.down9 = UNetDown(512, 512, normalize=False, dropout=0.5) # 출력: [512 X 1 X 1]
 
         # Skip Connection 사용(출력 채널의 크기 X 2 == 다음 입력 채널의 크기)
         self.up1 = UNetUp(512, 512, dropout=0.5) # 출력: [1024 X 2 X 2]
         self.up2 = UNetUp(1024, 512, dropout=0.5) # 출력: [1024 X 4 X 4]
-        self.up3 = UNetUp(1024, 512, dropout=0.5) # 출력: [1024 X 8 X 8]
-        self.up4 = UNetUp(1024, 512, dropout=0.5) # 출력: [1024 X 16 X 16]
-        self.up5 = UNetUp(1024, 256) # 출력: [512 X 32 X 32]
-        self.up6 = UNetUp(512, 128) # 출력: [256 X 64 X 64]
-        self.up7 = UNetUp(256, 64) # 출력: [128 X 128 X 128]
+        self.up3 = UNetUp(1024, 512, dropout=0.5) # 출력: [1024 X 4 X 4]
+        self.up4 = UNetUp(1024, 512, dropout=0.5) # 출력: [1024 X 8 X 8]
+        self.up5 = UNetUp(1024, 512, dropout=0.5) # 출력: [1024 X 16 X 16]
+        self.up6 = UNetUp(1024, 256) # 출력: [512 X 32 X 32]
+        self.up7 = UNetUp(512, 128) # 출력: [256 X 64 X 64]
+        self.up8 = UNetUp(256, 64) # 출력: [128 X 128 X 128]
 
         self.final = nn.Sequential(
             nn.Upsample(scale_factor=2), # 출력: [128 X 256 X 256]
@@ -81,15 +84,17 @@ class GeneratorUNet(nn.Module):
         d6 = self.down6(d5)
         d7 = self.down7(d6)
         d8 = self.down8(d7)
-        u1 = self.up1(d8, d7)
-        u2 = self.up2(u1, d6)
-        u3 = self.up3(u2, d5)
-        u4 = self.up4(u3, d4)
-        u5 = self.up5(u4, d3)
-        u6 = self.up6(u5, d2)
-        u7 = self.up7(u6, d1)
+        d9 = self.down9(d8)
+        u1 = self.up1(d9, d8)
+        u2 = self.up2(u1, d7)
+        u3 = self.up3(u2, d6)
+        u4 = self.up4(u3, d5)
+        u5 = self.up5(u4, d4)
+        u6 = self.up6(u5, d3)
+        u7 = self.up7(u6, d2)
+        u8 = self.up8(u7, d1)
 
-        return self.final(u7)
+        return self.final(u8)
 
 
 class BlueprintGenerator():
@@ -262,13 +267,13 @@ class BlueprintGenerator():
 
 
 if __name__ == '__main__':
-    model_path = "./models/20231108/G_no_ocr_binary_size1024_1109.pt"
+    model_path = "./Resources/models/G_best_size1024.pt"
     # model_path = "./models/Best_saved_models/G_best_size1024.pt"
     # model_path = "./models/saved_models_each_50epoch/G_size1024_350.pt"
     generator = BlueprintGenerator(model_path)
 
-    directory = 'statics/Images/SD_output_2/cycle_0'
-    file = 'statics/Images/SD_output_2/cycle_1/image_1014_(01).png'
+    directory = 'Statics/images/SD_output_2/cycle_6'
+    file = 'Statics/images/SD_output_2/cycle_1/image_1014_(01).png'
     
     image = Image.open(file)
     
@@ -281,7 +286,7 @@ if __name__ == '__main__':
     #                             output_dir='./output_2')
     # result_img = generator.run(save=True)
     
-    generator.data_load(image=image)
+    generator.data_load(directory=directory)
     generator.parameter_setting(
                             want_img='all', 
                             add_origin=True, 

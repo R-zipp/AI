@@ -116,7 +116,8 @@ class BlendToFBX():
         bpy.context.view_layer.objects.active = obj
         bpy.ops.object.mode_set(mode='EDIT')
         bpy.ops.mesh.select_all(action='SELECT')
-        bpy.ops.mesh.quads_convert_to_tris()
+        # bpy.ops.mesh.quads_convert_to_tris()
+        bpy.ops.uv.cube_project()
         bpy.ops.object.mode_set(mode='OBJECT')
         
     
@@ -180,17 +181,17 @@ class BlendToFBX():
             if 'Wall' in OBJS.name and 'Box' in OBJS.name:
                 # self.apply_shared_material(OBJS, detailed_material)
                 if self.is_horizontal(OBJS):
-                    self.apply_shared_material(OBJS, detailed_material_rotated)
-                else:
                     self.apply_shared_material(OBJS, detailed_material)
+                else:
+                    self.apply_shared_material(OBJS, detailed_material_rotated)
             if 'VertWalls' in OBJS.name:
                 self.apply_shared_material(OBJS, white_material)
 
         # Joins objects
         bpy.ops.object.join()
-
         # Get the current active object
         obj = bpy.context.object
+        obj.location = (0, 0, 0)
 
         self.scale_change(obj)
         
@@ -200,6 +201,8 @@ class BlendToFBX():
         self.triangulate_object(obj)
 
         fbx_file = os.path.join(fbx_dir, f'{name}_s{size_multiplier}_h{self.desired_height}_{texture_name}.fbx')
+        gltf_file = os.path.join(fbx_dir, f'{name}_s{size_multiplier}_h{self.desired_height}_{texture_name}.gltf')
+        glb_file = os.path.join(fbx_dir, f'{name}_s{size_multiplier}_h{self.desired_height}_{texture_name}.glb')
         with contextlib.redirect_stdout(io.StringIO()):
             bpy.ops.export_scene.fbx(
                                         filepath=fbx_file,
@@ -215,6 +218,16 @@ class BlendToFBX():
                                         path_mode='COPY',
                                         embed_textures=True
                                     )
+            # bpy.ops.export_scene.gltf(
+            #                             filepath=gltf_file,
+            #                             export_format='GLTF_EMBEDDED',  # 'GLTF_SEPARATE' 또는 'GLTF_EMBEDDED', 'GLB' 중 선택
+            #                             export_apply=True,              # 적용된 변형 내보내기
+            #                             # export_extras=True,             # 사용자 정의 속성 내보내기
+            #                             # export_yup=True,                # Y 축을 위로 설정
+            #                             # export_animations=True,         # 애니메이션 내보내기 (필요한 경우)
+            #                             # export_texture_dir="textures",  # 텍스처 폴더 지정 (GLTF_SEPARATE 선택시 필요)
+            #                         )
+
 
         bpy.ops.wm.quit_blender()
 
@@ -233,7 +246,7 @@ if __name__ == '__main__':
     fbx_file_path = converter.blend_to_fbx(
                                             blend_path, 
                                             fbx_dir, 
-                                            texture_name='plaster_2K', 
+                                            texture_name='brick_4k', 
                                             size_multiplier=float(size_multiplier), 
                                             ).replace('\\', '/')
     print(fbx_file_path)

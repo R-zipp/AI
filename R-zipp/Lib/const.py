@@ -10,7 +10,7 @@ DOWNLOAD_PATH = './statics/uploads/'
 
 
 # fbx converter
-TEXTURE_FILE_PATH = 'D:/workspace/Final_Project/AR-zipp/resources/textures/'
+TEXTURE_FILE_PATH = 'D:/workspace/Final_Project/R-zipp/resources/textures/'
 FBX_DIRECTORY = 'statics/fbx_file'
 DESIRED_HEIGHT = 3
-TILING_FACTOR = (0.1, 0.1)
+TILING_FACTOR = (0.2, 0.2)

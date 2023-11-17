@@ -7,7 +7,7 @@ from PIL import Image
 from io import BytesIO
 from botocore.exceptions import NoCredentialsError
 
-import const as const
+import Lib.const as const
 
 
 with open('resources/security/secret.json', 'r') as file:
