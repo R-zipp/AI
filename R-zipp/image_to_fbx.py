@@ -64,8 +64,8 @@ class ImageToFBX():
         
         process = subprocess.run(blender_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         
+        print(process.stdout.decode())
         if 'Error' in process.stdout.decode():
-            print(process.stdout.decode())
             raise Exception("Blender subprocess error")
         else:
             return process.stdout.decode().split('\n')[0]
@@ -79,7 +79,7 @@ class ImageToFBX():
         fbx_file_path = self.bpy_subprocess(blend_path, size_multiplier)
         
         print(f'convert successfully!   >> {fbx_file_path}')
-        return fbx_file_path     
+        return fbx_file_path
             
     def run(self, img_type, image, name=None, size=None):
         self.size = size
@@ -105,12 +105,15 @@ if __name__ == '__main__':
     
     # img_path = 'statics/Images/SD_output_2/cycle_1/image_1147_(01).png'
     # name = img_path.split('/')[-1]
+    # image = Image.open(os.path.join(img_dir, img_name))
+
+    # fbx_file = ItoFBX.run(img_type[1], image, name=name, size=32*3.3)
 
     img_dir = 'statics/Images/Original'
     img_list = os.listdir(img_dir)
     
     cnt = 0
-    for img_name in img_list[:5]:
+    for img_name in img_list[1:2]:
         name = img_name
     
         image = Image.open(os.path.join(img_dir, img_name))
