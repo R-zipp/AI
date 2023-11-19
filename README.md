@@ -26,7 +26,8 @@
 ### Blueprint to 3D
 도면을 분석하여 벽과 방을 탐지하고 Blender script를 사용하여 3D파일로 변환
 
-| 원본 도면 | 3D file |
-| :---: | :---: |
 | ![image_0009](https://github.com/R-zipp/AI/assets/141614581/b858b471-e6a5-46fa-af98-46bbf9f88efe) | ![제목 없음_1](https://github.com/R-zipp/AI/assets/141614581/aa85d60f-235f-4255-b60f-aeb86db5d476) |
+| :---: | :---: |
+| 원본 도면 | 3D file |
+
 ### Hand drawing to Blueprint
