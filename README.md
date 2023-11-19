@@ -28,6 +28,7 @@
 
 | 원본 도면 | 3D file |
 | :---: | :---: |
-|  ![image](https://github.com/R-zipp/AI/assets/141614581/cd6a0cbf-e3ad-4c93-b0a9-dd99e7a63208)
- |   |
+| ![image_0008](https://github.com/R-zipp/AI/assets/141614581/b31fdf09-265b-4bc6-8064-f96c2e18c7af)
+ | ![제목 없음_1](https://github.com/R-zipp/AI/assets/141614581/aa85d60f-235f-4255-b60f-aeb86db5d476)
+  |
 ### Hand drawing to Blueprint
