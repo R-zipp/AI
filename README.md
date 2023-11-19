@@ -23,12 +23,24 @@
 
 # 주요 기술
 
-### Blueprint to 3D
+## Blueprint to 3D
 도면을 분석하여 벽과 방을 탐지하고 Blender script를 사용하여 3D파일로 변환
 
 | ![image_0010](https://github.com/R-zipp/AI/assets/141614581/ef84f9ae-6b0e-42ca-881a-53ef8d7ec8e3) | ![제목 없음4](https://github.com/R-zipp/AI/assets/141614581/7cabb43b-fb10-4250-8466-b4c671c416a5) |
- |
 | :---: | :---: |
 | 원본 도면 | 3D file |
+
+
+- ### Detect walls and rooms
+  
+인식률 개선을 위하여 원본 도면을 이진화하고 벽, 방 탐지
+  
+| ![image_0018](https://github.com/R-zipp/AI/assets/141614581/dd3706a7-859e-4f44-9b70-038c3adff6f1) | ![image_0016](https://github.com/R-zipp/AI/assets/141614581/513bf31a-eddd-44a3-a2b0-3253bb77a5f3) | ![image_0017](https://github.com/R-zipp/AI/assets/141614581/0199fd06-78c7-4614-83b9-343b559cdaab) |
+| :---: | :---: | :---: |
+| Make binary | Walls | Rooms |
+
+- ### OCR
+
+  글자를 벽으로 인식하는 경우가 있어서 [EasyOCR](https://github.com/JaidedAI/EasyOCR)을 이용하여 제거
 
 ### Hand drawing to Blueprint
