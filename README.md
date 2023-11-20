@@ -91,6 +91,9 @@ AI기술을 활용하여 사용자가 도면을 입력하면 3D 파일(fbx, glb 
 
   pix2pix 모델을 이용하여 손 도면을 도면과 같은 형태로 이미지 생성
 
+  1) 
+  
+  | ![image_1192_(06) (1)](https://github.com/R-zipp/AI/assets/141614581/6f75c039-efd4-4fac-8ea2-a7d38ed1b4d7) | ![image_1192_(06) (2) (1)](https://github.com/R-zipp/AI/assets/141614581/b8e0a692-f6f7-49d8-b215-70cc0de270f6) | | |
   | :---: | :---: | :---: | :---: |
 
 ### 결과
