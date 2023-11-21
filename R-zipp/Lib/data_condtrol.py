@@ -42,6 +42,7 @@ class CreateDataset():
         upper_bound = np.array([limit, limit, limit], dtype=np.uint8)
         mask = cv2.inRange(img, lower_bound, upper_bound)
         img[np.where(mask == 0)] = [255, 255, 255]
+        img[np.where(mask == 255)] = [0, 0, 0]
 
         return img
     
@@ -112,6 +113,26 @@ class CreateDataset():
         return resized_image
     
         
+    def detect_walls(self, img):
+        origin_img = img.copy()
+        gray_image = cv2.cvtColor(origin_img, cv2.COLOR_BGR2GRAY)
+        self.wall_img = detect.wall_filter(gray_image)
+        boxes, w_img = detect.precise_boxes(self.wall_img, origin_img, color=[0,0,255])
+
+        return origin_img
+    
+    
+    def detect_rooms(self, img):
+        origin_img = img.copy()
+        self.detect_walls(origin_img)
+
+        rooms, colored_rooms = detect.find_rooms(~self.wall_img)
+        gray_rooms = cv2.cvtColor(colored_rooms, cv2.COLOR_BGR2GRAY)
+        boxes, blank_image = detect.precise_boxes(gray_rooms, origin_img, color=(0, 0, 255))
+
+        return blank_image
+    
+    
     def image_save(self, image, filename, output_dir='./output', same_name=False, index=0):
         try:
             os.makedirs(output_dir, exist_ok=True)
@@ -182,6 +203,9 @@ class CreateDataset():
         self.image = self.remove_text(self.image)
         # self.image = self.make_grayscale(self.image)
         self.image = self.cutting_image(self.image)
+        
+        # self.image = self.detect_walls(self.image)
+        # self.image = self.detect_rooms(self.image)
 
         self.image = self.remake_padding(self.image, padding_percent=self.padding_percent)
         self.image = self.proportion_control(self.image, aspect_ratio=self.aspect_ratio)
@@ -220,15 +244,25 @@ if __name__ == '__main__':
     create_dataset = CreateDataset()
     
     directory = 'statics/Images/Original'
-    file = 'statics/Images/Original/image_000.jpg'
+    # file = 'statics/Images/Original/image_038.jpg'
+    file = 'statics/Images/Original/image_029.jpg'
     
     create_dataset.data_load(file=file)
     # create_dataset.data_load(directory=directory)
+    # create_dataset.parameter_setting(
+    #                                 limit=130, 
+    #                                 aspect_ratio=1/1, 
+    #                                 output_dir='./statics/uploads',
+    #                                 new_width=800,
+    #                                 same_name=False)
+    # result_img = create_dataset.run(save=True)
     create_dataset.parameter_setting(
                                     limit=130, 
                                     aspect_ratio=1/1, 
-                                    output_dir='./statics/uploads',
-                                    new_width=800,
-                                    same_name=False)
-    result_img = create_dataset.run(save=True)
-    
+                                    output_dir='./test',
+                                    new_width=400,
+                                    padding_percent=0.15, 
+                                    # output_name=self.name,
+                                    # same_name=bool(self.name)
+                                    )
+    preprocessing_result, result_img = create_dataset.run(save=True)
