@@ -12,7 +12,7 @@ Copyright (C) 2022 Daniel Westberg
 """
 
 
-def create_blender_project(data_paths, target_folder):
+def create_blender_project(data_paths, target_folder, name):
     blender_install_path = ""
     blender_install_path = config.get_default_blender_installation_path()
     program_path = os.path.dirname(os.path.realpath(__file__))
@@ -21,7 +21,7 @@ def create_blender_project(data_paths, target_folder):
     if not os.path.exists("." + target_folder):
         os.makedirs("." + target_folder)
 
-    target_base = target_folder + const.TARGET_NAME
+    target_base = target_folder + name if name else target_folder + const.TARGET_NAME
     target_path = target_base + const.BASE_FORMAT
     target_path = (
         IO.get_next_target_base_name(target_base, target_path) + const.BASE_FORMAT

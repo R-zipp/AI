@@ -1,14 +1,11 @@
 import os
 from BlueprintToBlendLIb import (
-    IO,
-    config,
     const,
     execution,
     create_blender_project    
 )
 from BlueprintToBlendLIb.floorplan import new_floorplan
 from BlueprintToBlendLIb.calculate_floor_size import calculate_floor_size
-import configparser
 
 
 class BLueprintTo3D():
@@ -26,7 +23,7 @@ class BLueprintTo3D():
         base_name, extension = os.path.splitext(img_path.split('\\')[-1])
         
         data_paths = [execution.simple_single(floorplans, show=True, file_name=base_name)]
-        blender_project_path = create_blender_project.create_blender_project(data_paths, self.target_folder)
+        blender_project_path = create_blender_project.create_blender_project(data_paths, self.target_folder, name=base_name)
 
         area_size = calculate_floor_size(base_name)
         

@@ -1,8 +1,12 @@
 import ast
+import os
 
+import BlueprintToBlendLIb.const as const
 
 def calculate_floor_size(directory, out_type='square meter'):
-    coor_data = f'data/{directory}/floor_verts.txt'
+    data_path = const.BASE_PATH
+    coor_data = os.path.join(data_path, directory, 'floor_verts.txt')
+    
     with open(coor_data, "r") as f:
         coordinates = ast.literal_eval(f.read())
 
