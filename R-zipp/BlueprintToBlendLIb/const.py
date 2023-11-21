@@ -37,8 +37,8 @@ class MODE(Enum):
 
 
 # Paths to save folder
-BASE_PATH = "Data/"
-TARGET_PATH = "/Target/"
+BASE_PATH = "Statics/Data/"
+TARGET_PATH = "/Statics/blend_file/"
 TARGET_NAME = "floorplan"
 BLENDER_SCRIPT_PATH = "BlueprintToBlendLIb/Blender/floorplan_to_3dObject_in_blender.py"
 

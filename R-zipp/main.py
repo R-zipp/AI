@@ -24,6 +24,7 @@ app.mount("/statics", StaticFiles(directory="statics"), name="statics")
 dialog.figlet()
 dialog.init()
 
+
 class ImageInfo(BaseModel):
     drawingType: str
     userDrawingImage: str
