@@ -45,7 +45,7 @@ class BlendToFBX():
         mat.use_nodes = True
         nodes = mat.node_tree.nodes
         bsdf = nodes.get('Principled BSDF')
-        bsdf.inputs['Base Color'].default_value = (1.0, 1.0, 1.0, 1.0)  # RGBA 값 (흰색)
+        bsdf.inputs['Base Color'].default_value = (0.7, 0.7, 0.7, 0.7)  # RGBA 값 (흰색)
         return mat
 
 
@@ -56,7 +56,6 @@ class BlendToFBX():
 
         bsdf = nodes.get('Principled BSDF')
 
-        mapping_nodes = {}
         for texture_type, path in texture_paths.items():
             tex_image = nodes.new('ShaderNodeTexImage')
             tex_image.image = bpy.data.images.load(path)
@@ -87,10 +86,8 @@ class BlendToFBX():
                 links.new(normal_map.outputs['Normal'], bsdf.inputs['Normal'])
             elif texture_type == 'roughness':
                 links.new(tex_image.outputs['Color'], bsdf.inputs['Roughness'])
-                
-            mapping_nodes[texture_type] = mapping
 
-        return mat, mapping_nodes
+        return mat
 
 
     def apply_shared_material(self, obj, shared_material):
@@ -127,13 +124,11 @@ class BlendToFBX():
         width = max(bbox, key=lambda v: v.x).x - min(bbox, key=lambda v: v.x).x
         height = max(bbox, key=lambda v: v.y).y - min(bbox, key=lambda v: v.y).y
         depth = max(bbox, key=lambda v: v.z).z - min(bbox, key=lambda v: v.z).z
-        # print(f'width : {width}, height : {height}, depth : {depth}')
         
         return max([width, height]) > depth
 
     
     def create_rotated_material(self, base_material, rotation_angle):
-        # 기본 재질 복제
         rotated_material = base_material.copy()
         rotated_material.name = base_material.name + "_rotated"
 
@@ -168,7 +163,7 @@ class BlendToFBX():
             detailed_material_rotated = self.create_rotated_material(detailed_material, math.radians(90))
         else:
             detailed_material = self.create_white_material()
-            mapping_nodes = {}
+            detailed_material_rotated = self.create_white_material()
         white_material = self.create_white_material()
 
         # Mesh objects
@@ -246,7 +241,7 @@ if __name__ == '__main__':
     fbx_file_path = converter.blend_to_fbx(
                                             blend_path, 
                                             fbx_dir, 
-                                            texture_name='brick_4k', 
+                                            # texture_name='brick_4k', 
                                             size_multiplier=float(size_multiplier), 
                                             ).replace('\\', '/')
     print(fbx_file_path)

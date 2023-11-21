@@ -120,7 +120,7 @@ class CreateDataset():
         return resized_image
     
         
-    def image_save(self, file_path, output_dir='./output', base_filename = 'image', index=0):
+    def image_save(self, file_path, output_dir='./output_2', base_filename = 'image', index=0):
         try:
             if not os.path.exists(output_dir):
                 os.makedirs(output_dir)
@@ -151,7 +151,7 @@ class CreateDataset():
         cv2.imwrite('temp.PNG', self.image)
         # self.image = self.make_binary(self.image, limit=self.limit)
         # self.image = self.remove_text(self.image)
-        self.image = self.make_grayscale(self.image)
+        # self.image = self.make_grayscale(self.image)
         self.image = self.cutting_image(self.image)
 
         self.image = self.get_blueprint(self.image)
@@ -176,8 +176,8 @@ class CreateDataset():
 if __name__ == '__main__':
     create_dataset = CreateDataset()
     
-    directory = 'data/raw_data'
-    file = 'data/raw_data/image_217.jpg'
+    directory = 'original'
+    # file = 'data/raw_data/image_217.jpg'
     
     # create_dataset.data_load(file=file)
     create_dataset.data_load(directory=directory)

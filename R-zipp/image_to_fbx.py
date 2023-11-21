@@ -26,7 +26,7 @@ class ImageToFBX():
         generator.parameter_setting(
                                 want_img='all', 
                                 add_origin=False, 
-                                output_dir='./statics/generate_img',
+                                output_dir='./Statics/generate_img',
                                 output_name=self.name,
                                 new_width=700)
         generating_result, result_img = generator.run(save=True)
@@ -40,8 +40,8 @@ class ImageToFBX():
         preprocessing.parameter_setting(
                                         limit=130, 
                                         aspect_ratio=1/1, 
-                                        output_dir='./statics/preprocessing_img',
-                                        new_width=700,
+                                        output_dir='./Statics/preprocessing_img',
+                                        new_width=900,
                                         padding_percent=0.15, 
                                         output_name=self.name,
                                         same_name=bool(self.name))
@@ -68,7 +68,7 @@ class ImageToFBX():
         if 'Error' in process.stdout.decode():
             raise Exception("Blender subprocess error")
         else:
-            return process.stdout.decode().split('\n')[0]
+            return process.stdout.decode().split('\r\n')[0]
                         
     
     def process(self, preprocessing_result):
@@ -76,6 +76,7 @@ class ImageToFBX():
         blend_path, area_size = bLueprint_to_3D.make_blend(preprocessing_result)
 
         size_multiplier = round(self.size / area_size, 1) if self.size else 1
+        print(f'area_size : {area_size}')
         fbx_file_path = self.bpy_subprocess(blend_path, size_multiplier)
         
         print(f'convert successfully!   >> {fbx_file_path}')
@@ -103,23 +104,25 @@ if __name__ == '__main__':
     
     img_type = ["HANDIMG", "FLOORPLAN"]
     
-    # img_path = 'statics/Images/SD_output_2/cycle_1/image_1147_(01).png'
-    # name = img_path.split('/')[-1]
-    # image = Image.open(os.path.join(img_dir, img_name))
+    # img_path = 'statics/Images/Original/image_038.jpg'
+    # img_path = 'KakaoTalk_20231120_102837071.jpg'
+    img_path = 'test/KakaoTalk_20231120_192451607.jpg'
+    name = img_path.split('/')[-1]
+    image = Image.open(img_path)
 
-    # fbx_file = ItoFBX.run(img_type[1], image, name=name, size=32*3.3)
+    fbx_file = ItoFBX.run(img_type[1], image, name=name, size=28*3.3)
 
-    img_dir = 'statics/Images/Original'
-    img_list = os.listdir(img_dir)
+    # img_dir = 'statics/Images/Original'
+    # img_list = os.listdir(img_dir)
     
-    cnt = 0
-    for img_name in img_list[1:2]:
-        name = img_name
+    # cnt = 0
+    # for img_name in img_list[1:2]:
+    #     name = img_name
     
-        image = Image.open(os.path.join(img_dir, img_name))
+    #     image = Image.open(os.path.join(img_dir, img_name))
     
-        fbx_file = ItoFBX.run(img_type[1], image, name=name, size=32*3.3)
-        if fbx_file:
-            cnt += 1
+    #     fbx_file = ItoFBX.run(img_type[1], image, name=name, size=32*3.3)
+    #     if fbx_file:
+    #         cnt += 1
         
-    print(f'cnt : {cnt}')
+    # print(f'cnt : {cnt}')
