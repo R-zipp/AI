@@ -47,6 +47,13 @@ AI기술을 활용하여 사용자가 도면을 입력하면 3D 파일(fbx, glb 
 
   글자를 벽으로 인식하는 경우가 있어서 [EasyOCR](https://github.com/JaidedAI/EasyOCR)을 이용하여 제거
 
+  다만 텍스트가 세로로 되어있는 경우 인식율이 나쁘고 기울어져 있으면 인식이 불가능
+
+  | ![image](https://github.com/R-zipp/AI/assets/141614581/c9ffc6e1-a6d6-4136-9b35-7e5f6b5d3bda) | ![image](https://github.com/R-zipp/AI/assets/141614581/f306fb0c-407e-49f8-8d73-a1550b589ebc) | ![image](https://github.com/R-zipp/AI/assets/141614581/dfe259fe-0273-41ed-82f6-74274582fc50) |
+  | :---: | :---: | :---: |
+  | 원본 도면 | OCR | Text remove |
+  
+
 - #### bpy
 
   python을 사용한 Blender script 라이브러리. python에서 직접 사용도 가능하지만 불안정한 부분이 많아 추천하지 않는다. subprocess로 Blender를 실행시키고 거기서 script파일을 실행시키는 방법을 추천.
@@ -83,9 +90,13 @@ AI기술을 활용하여 사용자가 도면을 입력하면 3D 파일(fbx, glb 
  
      모든 도면에 대한 손 그림을 직접 그릴 수 없어 Stable Diffusion Cany 모델을 활용하여 도면의 모양을 유지하며 손으로 그린 듯한 이미지를 생성
      
+     하나의 도면을 이용하여 여러 장의 이미지를 생성하여 데이터를 증강함
+     
+     최종 데이터 셋은 하나의 도면 당 10장의 이미지를 생성하여 약 12000장을 이용하여 학습
+     
   | ![그림2](https://github.com/R-zipp/AI/assets/141614581/ca5b812c-7d68-43fc-8fa0-32d54981b900) | ![그림3](https://github.com/R-zipp/AI/assets/141614581/3fee87a2-1c7c-4dff-8250-0fe637e071fc) | ![그림4](https://github.com/R-zipp/AI/assets/141614581/59abaa6e-bdfd-4a02-948d-984a49477bcb) | ![그림5](https://github.com/R-zipp/AI/assets/141614581/b387252c-e904-4d8c-848d-385d01657cac) |
   | :---: | :---: | :---: | :---: |
-  | 원본 이미지 | Generated img1 | Generated img2 | Generated img1 |
+  | 원본 이미지 | Generated img1 | Generated img2 | Generated img3 |
 
 - #### Model train
 
@@ -93,10 +104,18 @@ AI기술을 활용하여 사용자가 도면을 입력하면 3D 파일(fbx, glb 
 
   1) 
   
-  | ![image_1192_(06) (1)](https://github.com/R-zipp/AI/assets/141614581/6f75c039-efd4-4fac-8ea2-a7d38ed1b4d7) | ![image_1192_(06) (2) (1)](https://github.com/R-zipp/AI/assets/141614581/b8e0a692-f6f7-49d8-b215-70cc0de270f6) | | |
-  | :---: | :---: | :---: | :---: |
+  
+
+<br/>
 
 ### 결과
+
+| ![그림1 (2)](https://github.com/R-zipp/AI/assets/141614581/265e36d8-119c-486d-88fa-6bc5527787d3) | ![그림2 (1)](https://github.com/R-zipp/AI/assets/141614581/2c4501a9-d54a-459a-9416-8fb37877759c) | ![ppt_1](https://github.com/R-zipp/AI/assets/141614581/5433c60d-f3e5-4a8f-8aa5-a5ae3e2f4ff2) |
+| :---: | :---: | :---: |
+| ![그림4 (1)](https://github.com/R-zipp/AI/assets/141614581/23acad0c-e3b1-4f08-9fe2-62c1e798138a) | ![그림5 (1)](https://github.com/R-zipp/AI/assets/141614581/81f0b640-a887-4a98-b580-13e102c30132) | ![ppt_2](https://github.com/R-zipp/AI/assets/141614581/ea7fb233-7db1-4889-a3fe-337c5d3e1f0e) |
+| Hand drawing image | Generated blueprint | 3D file |
+
+### 한계점
 
 
 
