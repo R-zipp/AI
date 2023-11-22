@@ -104,7 +104,7 @@ if __name__ == '__main__':
     
     # img_path = 'statics/Images/Original/image_038.jpg'
     # img_path = 'KakaoTalk_20231120_102837071.jpg'
-    img_path = 'test/KakaoTalk_20231120_192451607.jpg'
+    img_path = 'Statics/KakaoTalk_20231113_100916602.png'
     name = img_path.split('/')[-1]
     image = Image.open(img_path)
 

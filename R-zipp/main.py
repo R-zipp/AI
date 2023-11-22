@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Optional
 from PIL import Image
 import io
+import uvicorn
 
 from Lib.file_download_and_upload import save_file_in_S3, file_download_with_url
 from Lib.generate_blueprint import BlueprintGenerator
@@ -91,3 +92,7 @@ async def create_upload_file(file: UploadFile = File(...)):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Server error: {e}")
+    
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)

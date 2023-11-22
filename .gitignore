@@ -18,6 +18,10 @@ backup/unreal_test_API/
 AR-zipp/resources/security/
 
 
+# Data
+AR-zipp/Statics/Data/
+
+
 # Files
 *.fbx
 *.glb
@@ -26,8 +30,6 @@ AR-zipp/resources/security/
 *.jpg
 *.jpeg
 *.gif
-*.txt
-*.ini
 *.blend
 *.json
 *.PNG
