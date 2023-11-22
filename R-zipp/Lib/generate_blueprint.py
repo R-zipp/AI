@@ -7,12 +7,37 @@ import numpy as np
 
 
 
-# U-Net 아키텍처의 다운 샘플링(Down Sampling) 모듈
+class SelfAttention(nn.Module):
+    """ Self attention Layer"""
+    def __init__(self, in_dim):
+        super(SelfAttention,self).__init__()
+        self.chanel_in = in_dim
+        self.query_conv = nn.Conv2d(in_channels = in_dim , out_channels = in_dim//8 , kernel_size= 1)
+        self.key_conv = nn.Conv2d(in_channels = in_dim , out_channels = in_dim//8 , kernel_size= 1)
+        self.value_conv = nn.Conv2d(in_channels = in_dim , out_channels = in_dim , kernel_size= 1)
+        self.gamma = nn.Parameter(torch.zeros(1))
+        self.softmax = nn.Softmax(dim=-1)
+
+    def forward(self,x):
+        m_batchsize, C, width, height = x.size()
+        proj_query = self.query_conv(x).view(m_batchsize, -1, width*height).permute(0, 2, 1)
+        proj_key = self.key_conv(x).view(m_batchsize, -1, width*height)
+        energy = torch.bmm(proj_query, proj_key)
+        attention = self.softmax(energy)
+        proj_value = self.value_conv(x).view(m_batchsize, -1, width*height)
+
+        out = torch.bmm(proj_value, attention.permute(0, 2, 1))
+        out = out.view(m_batchsize, C, width, height)
+
+        out = self.gamma*out + x
+        return out
+
 class UNetDown(nn.Module):
-    def __init__(self, in_channels, out_channels, normalize=True, dropout=0.0):
+    def __init__(self, in_channels, out_channels, normalize=True, dropout=0.0, use_attention=False):
         super(UNetDown, self).__init__()
-        # 너비와 높이가 2배씩 감소
         layers = [nn.Conv2d(in_channels, out_channels, kernel_size=4, stride=2, padding=1, bias=False)]
+        if use_attention:
+            layers.append(SelfAttention(out_channels))
         if normalize:
             layers.append(nn.InstanceNorm2d(out_channels))
         layers.append(nn.LeakyReLU(0.2))
@@ -23,11 +48,10 @@ class UNetDown(nn.Module):
     def forward(self, x):
         return self.model(x)
 
-# U-Net 아키텍처의 업 샘플링(Up Sampling) 모듈: Skip Connection 사용
+
 class UNetUp(nn.Module):
     def __init__(self, in_channels, out_channels, dropout=0.0):
         super(UNetUp, self).__init__()
-        # 너비와 높이가 2배씩 증가
         layers = [nn.ConvTranspose2d(in_channels, out_channels, kernel_size=4, stride=2, padding=1, bias=False)]
         layers.append(nn.InstanceNorm2d(out_channels))
         layers.append(nn.ReLU(inplace=True))
@@ -37,60 +61,62 @@ class UNetUp(nn.Module):
 
     def forward(self, x, skip_input):
         x = self.model(x)
-        x = torch.cat((x, skip_input), 1) # 채널 레벨에서 합치기(concatenation)
+        x = torch.cat((x, skip_input), 1)
 
         return x
 
-# U-Net 생성자(Generator) 아키텍처
+
 class GeneratorUNet(nn.Module):
     def __init__(self, in_channels=3, out_channels=3):
         super(GeneratorUNet, self).__init__()
 
-        self.down1 = UNetDown(in_channels, 64, normalize=False) # 출력: [64 X 128 X 128]
+        self.down1 = UNetDown(in_channels, 64, normalize=False) 
 
-        self.down2 = UNetDown(64, 128) # 출력: [128 X 64 X 64]
-        self.down3 = UNetDown(128, 256) # 출력: [256 X 32 X 32]
-        self.down4 = UNetDown(256, 512, dropout=0.5) # 출력: [512 X 16 X 16]
-        self.down5 = UNetDown(512, 512, dropout=0.5) # 출력: [512 X 8 X 8]
-        self.down6 = UNetDown(512, 512, dropout=0.5) # 출력: [512 X 4 X 4]
-        self.down7 = UNetDown(512, 512, dropout=0.5) # 출력: [512 X 2 X 2]
-        self.down8 = UNetDown(512, 512, dropout=0.5) # 출력: [512 X 2 X 2]
-        self.down9 = UNetDown(512, 512, normalize=False, dropout=0.5) # 출력: [512 X 1 X 1]
+        self.down2 = UNetDown(64, 128) 
+        self.down3 = UNetDown(128, 256)
+        self.down4 = UNetDown(256, 512, dropout=0.5)
+        self.down5 = UNetDown(512, 512, dropout=0.5, use_attention=True)
+        self.down6_extra = UNetDown(512, 512, dropout=0.5, use_attention=True) 
+        self.down6 = UNetDown(512, 512, dropout=0.5, use_attention=True) 
+        self.down7 = UNetDown(512, 512, dropout=0.5, use_attention=True)
+        self.down8 = UNetDown(512, 512, dropout=0.5, use_attention=True)
+        self.down9 = UNetDown(512, 512, normalize=False, dropout=0.5)
 
-        # Skip Connection 사용(출력 채널의 크기 X 2 == 다음 입력 채널의 크기)
-        self.up1 = UNetUp(512, 512, dropout=0.5) # 출력: [1024 X 2 X 2]
-        self.up2 = UNetUp(1024, 512, dropout=0.5) # 출력: [1024 X 4 X 4]
-        self.up3 = UNetUp(1024, 512, dropout=0.5) # 출력: [1024 X 4 X 4]
-        self.up4 = UNetUp(1024, 512, dropout=0.5) # 출력: [1024 X 8 X 8]
-        self.up5 = UNetUp(1024, 512, dropout=0.5) # 출력: [1024 X 16 X 16]
-        self.up6 = UNetUp(1024, 256) # 출력: [512 X 32 X 32]
-        self.up7 = UNetUp(512, 128) # 출력: [256 X 64 X 64]
-        self.up8 = UNetUp(256, 64) # 출력: [128 X 128 X 128]
+        self.up1 = UNetUp(512, 512, dropout=0.5)
+        self.up2 = UNetUp(1024, 512, dropout=0.5) 
+        self.up3 = UNetUp(1024, 512, dropout=0.5) 
+        self.up4 = UNetUp(1024, 512, dropout=0.5) 
+        self.up5 = UNetUp(1024, 512, dropout=0.5)
+        self.up5_extra = UNetUp(1024, 512, dropout=0.5) 
+        self.up6 = UNetUp(1024, 256)
+        self.up7 = UNetUp(512, 128) 
+        self.up8 = UNetUp(256, 64)
 
         self.final = nn.Sequential(
-            nn.Upsample(scale_factor=2), # 출력: [128 X 256 X 256]
+            nn.Upsample(scale_factor=2),
             nn.ZeroPad2d((1, 0, 1, 0)),
-            nn.Conv2d(128, out_channels, kernel_size=4, padding=1), # 출력: [3 X 256 X 256]
+            nn.Conv2d(128, out_channels, kernel_size=4, padding=1), 
             nn.Tanh(),
         )
 
     def forward(self, x):
-        # 인코더부터 디코더까지 순전파하는 U-Net 생성자(Generator)
         d1 = self.down1(x)
         d2 = self.down2(d1)
         d3 = self.down3(d2)
         d4 = self.down4(d3)
         d5 = self.down5(d4)
         d6 = self.down6(d5)
-        d7 = self.down7(d6)
+        d6_extra = self.down6_extra(d6)
+        d7 = self.down7(d6_extra)
         d8 = self.down8(d7)
         d9 = self.down9(d8)
         u1 = self.up1(d9, d8)
         u2 = self.up2(u1, d7)
-        u3 = self.up3(u2, d6)
-        u4 = self.up4(u3, d5)
-        u5 = self.up5(u4, d4)
-        u6 = self.up6(u5, d3)
+        u3 = self.up3(u2, d6_extra)
+        u4 = self.up4(u3, d6)
+        u5 = self.up5(u4, d5)
+        u5_extra = self.up5_extra(u5, d4)
+        u6 = self.up6(u5_extra, d3)
         u7 = self.up7(u6, d2)
         u8 = self.up8(u7, d1)
 

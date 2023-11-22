@@ -1,6 +1,6 @@
 
 # image to fbx
-MODEL_PATH = "./resources/models/G_best_size1024.pt"
+MODEL_PATH = "./resources/models/G_best_size1122.pt"
 
 BLUEPRINT_TO_BLEND_SERVER_URL = 'http://127.0.0.1:8001/blueprint_to_3D'
 
