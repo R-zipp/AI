@@ -2,6 +2,8 @@
 
 메타버스 아카데미 2기 최종 프로젝트
 
+<br/>
+
 # 프로젝트 소개
 
 도면을 업로드 하여 3D 그래픽으로 구현해 원하는 물품들을 원하는 위치에 가상으로 배치할 수 있는 인테리어 서비스
@@ -9,6 +11,8 @@
 AI기술을 활용하여 사용자가 도면을 입력하면 3D 파일(fbx, glb 등)로 결과를 반환
 
 모든 사람이 집 도면을 구할 수 없고 실제 있는 집이 아니라 가상의 집을 만들 수 있도록 손으로 그린 도면 그림을 이용하여 도면을 생성하는 기능을 추가하였음
+
+<br/>
 
 # 팀원 소개 및 역할
 
@@ -24,6 +28,8 @@ AI기술을 활용하여 사용자가 도면을 입력하면 3D 파일(fbx, glb 
 - 김종민
 1. 손그림 학습을 위해 Stable Diffusion을 사용하여 데이터 셋 제작
 2. Hand drawting to Blueprint 모델 학습
+
+<br/>
 
 # 주요 기술
 
@@ -101,23 +107,19 @@ AI기술을 활용하여 사용자가 도면을 입력하면 3D 파일(fbx, glb 
 - #### Model train
 
   pix2pix 모델을 이용하여 손 도면을 도면과 같은 형태로 이미지 생성
-
-  1) 
   
-  
-
-<br/>
+  ||||||
+  | :---: | :---: | :---: | :---: | :---: |
+  | Epoch1 | Epoch10 | Epoch30 | Epoch50 | Epoch100 |
 
 ### 결과
 
-| ![그림1 (2)](https://github.com/R-zipp/AI/assets/141614581/265e36d8-119c-486d-88fa-6bc5527787d3) | ![그림2 (1)](https://github.com/R-zipp/AI/assets/141614581/2c4501a9-d54a-459a-9416-8fb37877759c) | ![ppt_1](https://github.com/R-zipp/AI/assets/141614581/5433c60d-f3e5-4a8f-8aa5-a5ae3e2f4ff2) |
-| :---: | :---: | :---: |
-| ![그림4 (1)](https://github.com/R-zipp/AI/assets/141614581/23acad0c-e3b1-4f08-9fe2-62c1e798138a) | ![그림5 (1)](https://github.com/R-zipp/AI/assets/141614581/81f0b640-a887-4a98-b580-13e102c30132) | ![ppt_2](https://github.com/R-zipp/AI/assets/141614581/ea7fb233-7db1-4889-a3fe-337c5d3e1f0e) |
-| Hand drawing image | Generated blueprint | 3D file |
+  | ![그림1 (2)](https://github.com/R-zipp/AI/assets/141614581/265e36d8-119c-486d-88fa-6bc5527787d3) | ![그림2 (1)](https://github.com/R-zipp/AI/assets/141614581/2c4501a9-d54a-459a-9416-8fb37877759c) | ![ppt_1](https://github.com/R-zipp/AI/assets/141614581/5433c60d-f3e5-4a8f-8aa5-a5ae3e2f4ff2) |
+  | :---: | :---: | :---: |
+  | ![그림4 (1)](https://github.com/R-zipp/AI/assets/141614581/23acad0c-e3b1-4f08-9fe2-62c1e798138a) | ![그림5 (1)](https://github.com/R-zipp/AI/assets/141614581/81f0b640-a887-4a98-b580-13e102c30132) | ![ppt_2](https://github.com/R-zipp/AI/assets/141614581/ea7fb233-7db1-4889-a3fe-337c5d3e1f0e) |
+  | Hand drawing image | Generated blueprint | 3D file |
 
-### 한계점
-
-
+<br/>
 
 # 기술 스택
 
@@ -134,3 +136,24 @@ AI기술을 활용하여 사용자가 도면을 입력하면 3D 파일(fbx, glb 
 <img src="https://img.shields.io/badge/Github-181717?style=for-the-badge&logo=Github&logoColor=white"> <img src="https://img.shields.io/badge/Notion-000000?style=for-the-badge&logo=Notion&logoColor=white">
 
 # 참고자료
+
+### Papers
+
+1. [Isola, P., Zhu, J., Zhou, T., & Efros, A. A. (2017, November 22). Image-to-Image Translation with Conditional Adversarial Networks. Arxiv. https://arxiv.org/abs/1611.07004](https://arxiv.org/abs/1611.07004)
+
+### GitHub
+
+1. [pytorch-CycleGAN-and-pix2pix](https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix)
+2. [pytorch-hed](https://github.com/sniklaus/pytorch-hed)
+3. [FloorplanToBlender3d](https://github.com/grebtsew/FloorplanToBlender3d)
+
+### Blog
+
+1. [[논문실습] Pix2Pix](https://velog.io/@wilko97/%EB%85%BC%EB%AC%B8%EC%8B%A4%EC%8A%B5-Pix2Pix)
+2. [딥러닝 기반 건축도면 생성 모델 개발](https://brunch.co.kr/@ddkddk35/10)
+
+<br/>
+
+---
+
+special thanks to [임정민](https://github.com/min731)
