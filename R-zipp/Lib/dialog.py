@@ -9,7 +9,7 @@ Copyright (C) 2022 Daniel Westberg
 """
 
 
-def figlet(text="R - ZIPP", font="Roman"):
+def figlet(text="R - ZIPP", font="slant"):
     print('')
     f = Figlet(font=font)
     # print(f.renderText(text)[:-50])

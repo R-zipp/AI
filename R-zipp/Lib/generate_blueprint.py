@@ -7,6 +7,8 @@ import numpy as np
 
 
 
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
 class SelfAttention(nn.Module):
     """ Self attention Layer"""
     def __init__(self, in_dim):
@@ -126,9 +128,10 @@ class GeneratorUNet(nn.Module):
 class BlueprintGenerator():
     def __init__(self, model_path):
         self.generator = GeneratorUNet()
-        self.generator.cuda()
+        # self.generator.cuda()
+        self.generator.to(device)
 
-        self.generator.load_state_dict(torch.load(model_path))
+        self.generator.load_state_dict(torch.load(model_path, map_location=device))
         self.generator.eval()
         
         self.data = None
@@ -167,7 +170,7 @@ class BlueprintGenerator():
             transforms.ToTensor(),
             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
         ])
-        image = transform(image).unsqueeze(0).cuda()
+        image = transform(image).unsqueeze(0).to(device)
 
         with torch.no_grad():
             generated_image = self.generator(image)

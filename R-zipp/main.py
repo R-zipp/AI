@@ -20,7 +20,7 @@ app = FastAPI()
 ItoFBX = ImageToFBX()
 generator = BlueprintGenerator(const.MODEL_PATH)
 
-app.mount("/statics", StaticFiles(directory="statics"), name="statics")
+app.mount("/Statics", StaticFiles(directory="Statics"), name="Statics")
 
 dialog.figlet()
 dialog.init()
@@ -56,16 +56,16 @@ async def download_and_return_fbx(item: ImageInfo):
     image = file_download_with_url(url, save=True ,filename=file_name)
 
     # Main process
-    try:
-        print('Run main process!')
+    # try:
+    print('Run main process!')
 
-        fbx_file = ItoFBX.run(img_type, image, name=file_name, size=int(houseSize)*3.3)
-        file_url = save_file_in_S3(fbx_file)
-            
-        return JSONResponse(content={'URL': file_url})
+    fbx_file = ItoFBX.run(img_type, image, name=file_name, size=int(houseSize)*3.3)
+    file_url = save_file_in_S3(fbx_file)
+        
+    return JSONResponse(content={'URL': file_url})
 
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Server error: {e}")
+    # except Exception as e:
+    #     raise HTTPException(status_code=500, detail=f"Server error: {e}")
     
 
 

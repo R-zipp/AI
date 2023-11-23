@@ -10,7 +10,7 @@ from botocore.exceptions import NoCredentialsError
 import Lib.const as const
 
 
-with open('resources/security/secret.json', 'r') as file:
+with open('Resources/security/secret.json', 'r') as file:
     data = json.load(file)
 
 ACCESS_KEY = data['AWS_ACCESSKEY']
