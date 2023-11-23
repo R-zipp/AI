@@ -9,8 +9,12 @@ pyfiglet==0.8.post1
 python-multipart==0.0.6
 opencv-python==4.2.0.34 
 
---extra-index-url https://download.pytorch.org/whl/cu118
-torch==2.1.1+cu118
---extra-index-url https://download.pytorch.org/whl/cu118
-torchaudio==2.1.1+cu118
+# --extra-index-url https://download.pytorch.org/whl/cu118
+# torch==2.1.1+cu118
+# --extra-index-url https://download.pytorch.org/whl/cu118
+# torchaudio==2.1.1+cu118
+# torchvision==0.16.1
+
+torch==2.1.1
+torchaudio==2.1.1
 torchvision==0.16.1
