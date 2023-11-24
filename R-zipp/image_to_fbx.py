@@ -62,7 +62,7 @@ class ImageToFBX():
         
         process = subprocess.run(blender_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         
-        print(process.stdout.decode())
+        # print(process.stdout.decode())
         if 'Error' in process.stdout.decode():
             raise Exception("Blender subprocess error")
         else:
@@ -104,7 +104,7 @@ if __name__ == '__main__':
     
     # img_path = 'statics/Images/Original/image_038.jpg'
     # img_path = 'KakaoTalk_20231120_102837071.jpg'
-    img_path = 'Statics/KakaoTalk_20231113_100916602.png'
+    img_path = 'test/KakaoTalk_20231124_105156273.jpg'
     name = img_path.split('/')[-1]
     image = Image.open(img_path)
 

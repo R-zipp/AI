@@ -19,22 +19,20 @@ AR-zipp/resources/security/
 
 
 # Data
-AR-zipp/Statics/Data/
+AR-zipp/Statics/
+AR-zipp/resources/
 
 
 # Files
 *.fbx
 *.glb
 *.gltf
-*.png
-*.jpg
-*.jpeg
 *.gif
 *.blend
 *.json
-*.PNG
 *.pt
 *.bin
 
+
 # etc
-__pycache__/
+/__pycache__/
