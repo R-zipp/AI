@@ -20,7 +20,7 @@ AR-zipp/resources/security/
 
 # Data
 AR-zipp/Statics/
-AR-zipp/resources/
+AR-zipp/Resources/
 
 
 # Files
@@ -35,4 +35,4 @@ AR-zipp/resources/
 
 
 # etc
-/__pycache__/
+__pycache__/

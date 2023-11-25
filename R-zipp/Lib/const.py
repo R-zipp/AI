@@ -10,7 +10,7 @@ DOWNLOAD_PATH = './Statics/uploads/'
 
 
 # fbx converter
-TEXTURE_FILE_PATH = 'D:/workspace/Final_Project/R-zipp/resources/textures/'
+TEXTURE_FILE_PATH = 'D:/workspace/Final_Project/R-zipp/Resources/textures/'
 FBX_DIRECTORY = 'Statics/fbx_file'
 DESIRED_HEIGHT = 3
 TILING_FACTOR = (0.2, 0.2)

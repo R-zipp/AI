@@ -23,20 +23,24 @@ class BlendToFBX():
     def texture_loader(self, texture_name):
         
         texture_list = os.listdir(os.path.join(self.default_path, texture_name))
+        texture_list_low = [name.lower() for name in texture_list]
         
         texture_paths = {}
-        for texture in texture_list:
-            if 'Albedo' in texture:
+        for texture_low, texture in zip(texture_list_low, texture_list):
+            if 'albedo' in texture_low or 'diff' in texture_low:
                 texture_paths['albedo'] = f'{self.default_path}{texture_name}/{texture}'
-            if 'ao' in texture:
+            if 'ao' in texture_low:
                 texture_paths['ao'] = f'{self.default_path}{texture_name}/{texture}'
-            if 'displacement' in texture:
+            if 'displacement' in texture_low or 'disp' in texture_low:
                 texture_paths['displacement'] = f'{self.default_path}{texture_name}/{texture}'
-            if 'normal' in texture:
+            if 'normal' in texture_low:
                 texture_paths['normal'] = f'{self.default_path}{texture_name}/{texture}'
-            if 'roughness' in texture:
+            if 'roughness' in texture_low or 'rough' in texture_low:
                 texture_paths['roughness'] = f'{self.default_path}{texture_name}/{texture}'
+            if 'gl' in texture_low:
+                texture_paths['glossiness'] = f'{self.default_path}{texture_name}/{texture}'
         
+        print(f'texture_paths : {texture_paths}')
         return texture_paths
 
 
@@ -73,7 +77,6 @@ class BlendToFBX():
             if texture_type == 'albedo':
                 links.new(tex_image.outputs['Color'], bsdf.inputs['Base Color'])
             elif texture_type == 'ao':
-                # AO는 별도의 처리가 필요할 수 있습니다
                 pass
             elif texture_type == 'displacement':
                 material_output = nodes.get('Material Output')
@@ -86,6 +89,10 @@ class BlendToFBX():
                 links.new(normal_map.outputs['Normal'], bsdf.inputs['Normal'])
             elif texture_type == 'roughness':
                 links.new(tex_image.outputs['Color'], bsdf.inputs['Roughness'])
+            elif texture_type == 'glossiness':
+                invert_node = nodes.new('ShaderNodeInvert')
+                links.new(tex_image.outputs['Color'], invert_node.inputs['Color'])
+                links.new(invert_node.outputs['Color'], bsdf.inputs['Roughness'])
 
         return mat
 
@@ -159,7 +166,7 @@ class BlendToFBX():
 
         if texture_name:
             texture_paths = self.texture_loader(texture_name)
-            detailed_material, mapping_nodes = self.create_detailed_material(texture_paths)
+            detailed_material = self.create_detailed_material(texture_paths)
             detailed_material_rotated = self.create_rotated_material(detailed_material, math.radians(90))
         else:
             detailed_material = self.create_white_material()
@@ -241,7 +248,7 @@ if __name__ == '__main__':
     fbx_file_path = converter.blend_to_fbx(
                                             blend_path, 
                                             fbx_dir, 
-                                            # texture_name='brick_4k', 
+                                            texture_name='StuccoRoughCast001', 
                                             size_multiplier=float(size_multiplier), 
                                             ).replace('\\', '/')
-    print(fbx_file_path)
+    print(f'result : {fbx_file_path}')

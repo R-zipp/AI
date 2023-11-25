@@ -62,11 +62,14 @@ class ImageToFBX():
         
         process = subprocess.run(blender_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         
-        # print(process.stdout.decode())
+        result = process.stdout.decode().split('\r\n')
+        print([name for name in result if 'texture_paths' in name])
+        fbx_path = [name for name in result if 'result' in name][0].split(' ')[-1]
+        
         if 'Error' in process.stdout.decode():
             raise Exception("Blender subprocess error")
         else:
-            return process.stdout.decode().split('\r\n')[0]
+            return fbx_path
                         
     
     def process(self, preprocessing_result):
@@ -74,7 +77,7 @@ class ImageToFBX():
         blend_path, area_size = bLueprint_to_3D.make_blend(preprocessing_result)
 
         size_multiplier = round(self.size / area_size, 1) if self.size else 1
-        print(f'area_size : {area_size}')
+        
         fbx_file_path = self.bpy_subprocess(blend_path, size_multiplier)
         
         print(f'convert successfully!   >> {fbx_file_path}')
@@ -104,11 +107,11 @@ if __name__ == '__main__':
     
     # img_path = 'statics/Images/Original/image_038.jpg'
     # img_path = 'KakaoTalk_20231120_102837071.jpg'
-    img_path = 'test/KakaoTalk_20231124_105156273.jpg'
+    img_path = 'Statics/test_2.png'
     name = img_path.split('/')[-1]
     image = Image.open(img_path)
 
-    fbx_file = ItoFBX.run(img_type[1], image, name=name, size=28*3.3)
+    fbx_file = ItoFBX.run(img_type[0], image, name=name, size=28*3.3)
 
     # img_dir = 'statics/Images/Original'
     # img_list = os.listdir(img_dir)
