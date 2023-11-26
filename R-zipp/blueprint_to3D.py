@@ -5,7 +5,7 @@ from BlueprintToBlendLIb import (
     create_blender_project    
 )
 from BlueprintToBlendLIb.floorplan import new_floorplan
-from BlueprintToBlendLIb.calculate_floor_size import calculate_floor_size
+from BlueprintToBlendLIb.calculate_floor_size import calculate_floor_size, calculate_centroid_3d
 
 
 class BLueprintTo3D():

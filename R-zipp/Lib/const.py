@@ -13,4 +13,4 @@ DOWNLOAD_PATH = './Statics/uploads/'
 TEXTURE_FILE_PATH = 'D:/workspace/Final_Project/R-zipp/Resources/textures/'
 FBX_DIRECTORY = 'Statics/fbx_file'
 DESIRED_HEIGHT = 3
-TILING_FACTOR = (0.2, 0.2)
+TILING_FACTOR = (0.5, 0.5)

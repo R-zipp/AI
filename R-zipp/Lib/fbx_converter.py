@@ -3,6 +3,7 @@ import os
 import io
 import math
 import contextlib
+import ast
 from mathutils import Vector
 
 import sys
@@ -40,7 +41,6 @@ class BlendToFBX():
             if 'gl' in texture_low:
                 texture_paths['glossiness'] = f'{self.default_path}{texture_name}/{texture}'
         
-        print(f'texture_paths : {texture_paths}')
         return texture_paths
 
 
@@ -77,7 +77,19 @@ class BlendToFBX():
             if texture_type == 'albedo':
                 links.new(tex_image.outputs['Color'], bsdf.inputs['Base Color'])
             elif texture_type == 'ao':
-                pass
+                mix_node = nodes.new('ShaderNodeMixRGB')
+                mix_node.blend_type = 'MULTIPLY'
+                links.new(tex_image.outputs['Color'], mix_node.inputs[1])
+
+                # Check if there is a link to the Base Color input
+                base_color_links = bsdf.inputs['Base Color'].links
+                if base_color_links:
+                    base_color_link = base_color_links[0]  # Get the first link
+                    links.new(base_color_link.from_socket, mix_node.inputs[2])
+                    links.new(mix_node.outputs[0], bsdf.inputs['Base Color'])
+                else:
+                    # If no base color link, connect AO directly to Base Color
+                    links.new(tex_image.outputs['Color'], bsdf.inputs['Base Color'])
             elif texture_type == 'displacement':
                 material_output = nodes.get('Material Output')
                 disp_node = nodes.new('ShaderNodeDisplacement')
@@ -145,7 +157,7 @@ class BlendToFBX():
                 node.inputs['Rotation'].default_value[2] = rotation_angle
 
         return rotated_material
-    
+        
     
     def postprocessing(self, obj):
         # Auto UV Mapping
@@ -172,10 +184,10 @@ class BlendToFBX():
             detailed_material = self.create_white_material()
             detailed_material_rotated = self.create_white_material()
         white_material = self.create_white_material()
-
+            
         # Mesh objects
         MSH_OBJS = [m for m in bpy.context.scene.objects if m.type == 'MESH']
-
+        
         for OBJS in MSH_OBJS:
             OBJS.select_set(state=True)
             bpy.context.view_layer.objects.active = OBJS
@@ -188,9 +200,10 @@ class BlendToFBX():
                     self.apply_shared_material(OBJS, detailed_material_rotated)
             if 'VertWalls' in OBJS.name:
                 self.apply_shared_material(OBJS, white_material)
-
+            
         # Joins objects
         bpy.ops.object.join()
+        
         # Get the current active object
         obj = bpy.context.object
         obj.location = (0, 0, 0)
@@ -243,8 +256,10 @@ if __name__ == '__main__':
     
     blend_path = os.environ.get('BLEND_PATH', 'default')
     size_multiplier = os.environ.get('SIZE_MULTIPLIER', 'default')
+    texture_name = os.environ.get('WALLPAPER_NO', 'default')
     
     fbx_dir = const.FBX_DIRECTORY
+    
     fbx_file_path = converter.blend_to_fbx(
                                             blend_path, 
                                             fbx_dir, 
