@@ -30,13 +30,18 @@ class ImageInfo(BaseModel):
     drawingType: str
     userDrawingImage: str
     houseSize: Optional[str] = None
+    wallPaperNo: Optional[int] = None
+
 
 @app.post("/spring/img_to_fbx_S3")
 async def download_and_return_fbx(item: ImageInfo):
     img_type = item.drawingType
     url = item.userDrawingImage
-    houseSize = item.houseSize
-    print(f'img_type : {img_type}, houseSize : {houseSize}')
+    house_size = item.houseSize.split('_')[0]
+    house_size_type = item.houseSize.split('_')[1]
+    wallpaper_no = item.wallPaperNo
+    
+    print(f'img_type : {img_type}, houseSize : {house_size}, house_type : {house_size_type}, wallPaperNo : {wallpaper_no}')
     
     # Validation
     if not url:
@@ -51,6 +56,13 @@ async def download_and_return_fbx(item: ImageInfo):
     
     if img_type not in ["HANDIMG", "FLOORPLAN"]:
         raise HTTPException(status_code=400, detail="Invalid image type, only HANDIMG, FLOORPLAN are allowed")
+    
+    if house_size_type == 'squaremeter':
+        house_size = int(house_size)
+    elif house_size_type == 'pyeong':
+        house_size = int(house_size) * 3.3
+    else:
+        raise HTTPException(status_code=400, detail="Invalid size type, only squaremeter, pyeong are allowed")
 
     # File download
     image = file_download_with_url(url, save=True ,filename=file_name)
@@ -59,10 +71,18 @@ async def download_and_return_fbx(item: ImageInfo):
     # try:
     print('Run main process!')
 
-    fbx_file = ItoFBX.run(img_type, image, name=file_name, size=int(houseSize)*3.3)
+    fbx_file = ItoFBX.run(
+                            img_type, 
+                            image, 
+                            name=file_name, 
+                            size=house_size, 
+                            wallpaper_no=wallpaper_no
+                            )
     file_url = save_file_in_S3(fbx_file)
-        
-    return JSONResponse(content={'URL': file_url})
+    
+    data = {'URL': file_url}
+    print(data)
+    return JSONResponse(content=data)
 
     # except Exception as e:
     #     raise HTTPException(status_code=500, detail=f"Server error: {e}")

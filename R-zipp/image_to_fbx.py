@@ -48,11 +48,13 @@ class ImageToFBX():
         return preprocessing_result, result_img
             
     
-    def bpy_subprocess(self, blend_path, size_multiplier):
+    def bpy_subprocess(self, blend_path, area_size):
         blender_script = 'Lib/fbx_converter.py'
+        size_multiplier = round(self.size / area_size, 1) if self.size else 1
 
-        os.environ['BLEND_PATH'] = blend_path
+        os.environ['BLEND_PATH'] = str(blend_path)
         os.environ['SIZE_MULTIPLIER'] = str(size_multiplier)
+        os.environ['WALLPAPER_NO'] = str(self.wallpaper_no)
         
         blender_command = [
                             'C:/Program Files/Blender Foundation/Blender 3.6/blender.exe',
@@ -62,30 +64,32 @@ class ImageToFBX():
         
         process = subprocess.run(blender_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         
-        result = process.stdout.decode().split('\r\n')
-        print([name for name in result if 'texture_paths' in name])
-        fbx_path = [name for name in result if 'result' in name][0].split(' ')[-1]
-        
+        print(process.stdout.decode())
         if 'Error' in process.stdout.decode():
+            print(process.stdout.decode())
             raise Exception("Blender subprocess error")
         else:
+            result = process.stdout.decode().split('\r\n')
+            fbx_path = [name for name in result if 'result' in name][0].split(' ')[-1]
+            
+            print(f'convert successfully!   >> {fbx_path}')
+            
             return fbx_path
                         
     
     def process(self, preprocessing_result):
         # blueprint to blend file
         blend_path, area_size = bLueprint_to_3D.make_blend(preprocessing_result)
-
-        size_multiplier = round(self.size / area_size, 1) if self.size else 1
         
-        fbx_file_path = self.bpy_subprocess(blend_path, size_multiplier)
+        fbx_file_path = self.bpy_subprocess(blend_path, area_size)
         
-        print(f'convert successfully!   >> {fbx_file_path}')
         return fbx_file_path
             
-    def run(self, img_type, image, name=None, size=None):
+            
+    def run(self, img_type, image, name=None, size=None, wallpaper_no=None):
         self.size = size
         self.name = name
+        self.wallpaper_no = wallpaper_no
         
         # mode select
         if img_type == 'HANDIMG':
