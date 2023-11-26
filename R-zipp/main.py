@@ -80,9 +80,7 @@ async def download_and_return_fbx(item: ImageInfo):
                             )
     file_url = save_file_in_S3(fbx_file)
     
-    data = {'URL': file_url}
-    print(data)
-    return JSONResponse(content=data)
+    return JSONResponse(content={'URL': file_url})
 
     # except Exception as e:
     #     raise HTTPException(status_code=500, detail=f"Server error: {e}")

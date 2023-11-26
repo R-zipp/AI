@@ -1,6 +1,7 @@
 from PIL import Image
-import os
 import subprocess
+import os
+import configparser
 
 from Lib.data_condtrol import CreateDataset
 from Lib.generate_blueprint import BlueprintGenerator
@@ -11,11 +12,13 @@ from blueprint_to3D import BLueprintTo3D
 preprocessing = CreateDataset()
 generator = BlueprintGenerator(const.MODEL_PATH)
 bLueprint_to_3D = BLueprintTo3D()
+config = configparser.ConfigParser()
 
+config.read('Configs/system.ini')
     
 class ImageToFBX():
     def __init__(self):
-        self.url = const.BLUEPRINT_TO_BLEND_SERVER_URL
+        pass
     
     
     def handimg_to_fbx(self, origin_image):
@@ -49,22 +52,23 @@ class ImageToFBX():
             
     
     def bpy_subprocess(self, blend_path, area_size):
-        blender_script = 'Lib/fbx_converter.py'
+        blender_script = const.BLENDER_SCRIPT
         size_multiplier = round(self.size / area_size, 1) if self.size else 1
 
         os.environ['BLEND_PATH'] = str(blend_path)
         os.environ['SIZE_MULTIPLIER'] = str(size_multiplier)
-        os.environ['WALLPAPER_NO'] = str(self.wallpaper_no)
+        if self.wallpaper_no:
+            os.environ['WALLPAPER_NO'] = str(self.wallpaper_no)
         
         blender_command = [
-                            'C:/Program Files/Blender Foundation/Blender 3.6/blender.exe',
+                            config['SYSTEM']['blender_installation_path'],
                             '-b',
                             '--python', blender_script
                             ]
         
         process = subprocess.run(blender_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         
-        print(process.stdout.decode())
+        # print(process.stdout.decode())
         if 'Error' in process.stdout.decode():
             print(process.stdout.decode())
             raise Exception("Blender subprocess error")

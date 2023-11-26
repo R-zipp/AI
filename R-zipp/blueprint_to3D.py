@@ -5,7 +5,7 @@ from BlueprintToBlendLIb import (
     create_blender_project    
 )
 from BlueprintToBlendLIb.floorplan import new_floorplan
-from BlueprintToBlendLIb.calculate_floor_size import calculate_floor_size, calculate_centroid_3d
+from BlueprintToBlendLIb.calculate_floor_size import calculate_floor_size
 
 
 class BLueprintTo3D():
@@ -15,7 +15,6 @@ class BLueprintTo3D():
 
 
     def make_blend(self, img_path):
-        print("")
         print("Creates blender project")
 
         floorplans = new_floorplan(img_path)
