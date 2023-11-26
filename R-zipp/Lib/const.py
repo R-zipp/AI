@@ -2,7 +2,7 @@
 # image to fbx
 MODEL_PATH = "./Resources/models/G_best_size1122.pt"
 
-BLUEPRINT_TO_BLEND_SERVER_URL = 'http://127.0.0.1:8001/blueprint_to_3D'
+BLENDER_SCRIPT = './Lib/fbx_converter_v2.py'
 
 
 # file download and upload
@@ -14,3 +14,10 @@ TEXTURE_FILE_PATH = 'D:/workspace/Final_Project/R-zipp/Resources/textures/'
 FBX_DIRECTORY = 'Statics/fbx_file'
 DESIRED_HEIGHT = 3
 TILING_FACTOR = (0.5, 0.5)
+
+WALLPAPER_LIST = {
+                '1' : 'beige_wall_001_4k', 
+                '2' : 'CityStreetAsphaltGenericClean001', 
+                '3' : 'plastered_wall_4k', 
+                '4' : 'QuartziteDenali002_8k'
+                }

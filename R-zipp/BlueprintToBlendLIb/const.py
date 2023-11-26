@@ -116,8 +116,8 @@ DEBUG_ROOM = False
 DEBUG_WALL = False
 
 # CONFIG
-SYSTEM_CONFIG_FILE_NAME = "./BlueprintToBlendLIb/Configs/system.ini"
-IMAGE_DEFAULT_CONFIG_FILE_NAME = "./BlueprintToBlendLIb/Configs/default.ini"
+SYSTEM_CONFIG_FILE_NAME = "./Configs/system.ini"
+IMAGE_DEFAULT_CONFIG_FILE_NAME = "./Configs/default.ini"
 
 # CONFIG field/key names
 # These values are used as backup incase config.ini can't be found.

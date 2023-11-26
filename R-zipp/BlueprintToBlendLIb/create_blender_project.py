@@ -40,7 +40,6 @@ def create_blender_project(data_paths, target_folder, name):
         ]
         + data_paths
     )
-    print('-------------------------------')
     outformat = config.get(
         const.SYSTEM_CONFIG_FILE_NAME, "SYSTEM", const.STR_OUT_FORMAT
     ).replace('"', "")
