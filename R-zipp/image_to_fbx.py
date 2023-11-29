@@ -113,13 +113,13 @@ if __name__ == '__main__':
     
     img_type = ["HANDIMG", "FLOORPLAN"]
     
-    # img_path = 'statics/Images/Original/image_038.jpg'
+    img_path = 'statics/Images/Original/image_038.jpg'
     # img_path = 'KakaoTalk_20231120_102837071.jpg'
-    img_path = 'Statics/test_2.png'
+    # img_path = 'Statics/test_2.png'
     name = img_path.split('/')[-1]
     image = Image.open(img_path)
 
-    fbx_file = ItoFBX.run(img_type[0], image, name=name, size=28*3.3)
+    fbx_file = ItoFBX.run(img_type[1], image, name=name, size=32*3.3)
 
     # img_dir = 'statics/Images/Original'
     # img_list = os.listdir(img_dir)

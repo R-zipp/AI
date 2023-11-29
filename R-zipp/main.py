@@ -103,7 +103,7 @@ async def create_upload_file(file: UploadFile = File(...)):
     try:
         print('Run main process!')
 
-        fbx_file = ItoFBX.run(img_type[0], image, name='test.png', size=32*3.3)
+        fbx_file = ItoFBX.run(img_type[1], image, name='test.png', size=5*3.3)
         file_url = save_file_in_S3(fbx_file)
             
         return JSONResponse(content={'URL': file_url})
@@ -114,3 +114,4 @@ async def create_upload_file(file: UploadFile = File(...)):
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
+    # uvicorn.run(app, port=8000)
