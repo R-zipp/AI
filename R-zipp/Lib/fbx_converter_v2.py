@@ -281,7 +281,7 @@ if __name__ == '__main__':
     
     blend_path = os.environ.get('BLEND_PATH', 'default')
     size_multiplier = os.environ.get('SIZE_MULTIPLIER', 'default')
-    wallpaper_no = os.environ.get('WALLPAPER_NO', '2')
+    wallpaper_no = os.environ.get('WALLPAPER_NO', '7')
     
     wallpaper_list = const.WALLPAPER_LIST
     

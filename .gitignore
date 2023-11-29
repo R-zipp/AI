@@ -22,12 +22,13 @@ R-zipp/resources/security/
 R-zipp/Statics/
 R-zipp/Resources/
 
+Docs/
+
 
 # Files
 *.fbx
 *.glb
 *.gltf
-*.gif
 *.blend
 *.json
 *.pt

@@ -1,4 +1,5 @@
 import torchvision.transforms as transforms
+import torch.nn.functional as F
 from PIL import Image
 import torch
 import torch.nn as nn
@@ -6,8 +7,49 @@ import os
 import numpy as np
 
 
-
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+
+class Mish(nn.Module):
+    def __init__(self):
+        super(Mish, self).__init__()
+
+    def forward(self, x):
+        return x * torch.tanh(F.softplus(x))
+
+
+class MultiHeadAttention(nn.Module):
+    def __init__(self, in_dim, num_heads):
+        super(MultiHeadAttention, self).__init__()
+        self.num_heads = num_heads
+        self.dim_per_head = in_dim // num_heads
+
+        self.query_convs = nn.ModuleList([nn.Conv2d(in_dim, self.dim_per_head, kernel_size=1) for _ in range(num_heads)])
+        self.key_convs = nn.ModuleList([nn.Conv2d(in_dim, self.dim_per_head, kernel_size=1) for _ in range(num_heads)])
+        self.value_convs = nn.ModuleList([nn.Conv2d(in_dim, self.dim_per_head, kernel_size=1) for _ in range(num_heads)])
+
+        self.softmax = nn.Softmax(dim=-1)
+        self.output_conv = nn.Conv2d(in_dim, in_dim, kernel_size=1)
+
+
+    def forward(self, x):
+        batch_size, _, width, height = x.size()
+        heads = []
+
+        for i in range(self.num_heads):
+            proj_query = self.query_convs[i](x).view(batch_size, -1, width * height).permute(0, 2, 1)
+            proj_key = self.key_convs[i](x).view(batch_size, -1, width * height)
+            proj_value = self.value_convs[i](x).view(batch_size, -1, width * height)
+
+            energy = torch.bmm(proj_query, proj_key)
+            attention = self.softmax(energy)
+            head = torch.bmm(proj_value, attention.permute(0, 2, 1))
+            heads.append(head.view(batch_size, self.dim_per_head, width, height))
+
+        multi_head = torch.cat(heads, dim=1)
+        output = self.output_conv(multi_head)
+        return output
+
 
 class SelfAttention(nn.Module):
     """ Self attention Layer"""
@@ -19,6 +61,7 @@ class SelfAttention(nn.Module):
         self.value_conv = nn.Conv2d(in_channels = in_dim , out_channels = in_dim , kernel_size= 1)
         self.gamma = nn.Parameter(torch.zeros(1))
         self.softmax = nn.Softmax(dim=-1)
+
 
     def forward(self,x):
         m_batchsize, C, width, height = x.size()
@@ -34,21 +77,31 @@ class SelfAttention(nn.Module):
         out = self.gamma*out + x
         return out
 
+
 class UNetDown(nn.Module):
-    def __init__(self, in_channels, out_channels, normalize=True, dropout=0.0, use_attention=False):
+    def __init__(self, in_channels, out_channels, normalize=True, dropout=0.0, use_attention=False, num_heads=8):
         super(UNetDown, self).__init__()
         layers = [nn.Conv2d(in_channels, out_channels, kernel_size=4, stride=2, padding=1, bias=False)]
         if use_attention:
             layers.append(SelfAttention(out_channels))
+            self.attention = MultiHeadAttention(out_channels, num_heads)
+        else:
+            self.attention = None
         if normalize:
             layers.append(nn.InstanceNorm2d(out_channels))
-        layers.append(nn.LeakyReLU(0.2))
+        # layers.append(nn.LeakyReLU(0.2))
+        layers.append(Mish())
+
         if dropout:
             layers.append(nn.Dropout(dropout))
         self.model = nn.Sequential(*layers)
 
+
     def forward(self, x):
-        return self.model(x)
+        x = self.model(x)
+        if self.attention:
+            x = self.attention(x)
+        return x
 
 
 class UNetUp(nn.Module):
@@ -56,10 +109,13 @@ class UNetUp(nn.Module):
         super(UNetUp, self).__init__()
         layers = [nn.ConvTranspose2d(in_channels, out_channels, kernel_size=4, stride=2, padding=1, bias=False)]
         layers.append(nn.InstanceNorm2d(out_channels))
-        layers.append(nn.ReLU(inplace=True))
+        # layers.append(nn.ReLU(inplace=True))
+        layers.append(Mish())
+
         if dropout:
             layers.append(nn.Dropout(dropout))
         self.model = nn.Sequential(*layers)
+
 
     def forward(self, x, skip_input):
         x = self.model(x)
@@ -76,12 +132,12 @@ class GeneratorUNet(nn.Module):
 
         self.down2 = UNetDown(64, 128) 
         self.down3 = UNetDown(128, 256)
-        self.down4 = UNetDown(256, 512, dropout=0.5)
-        self.down5 = UNetDown(512, 512, dropout=0.5, use_attention=True)
-        self.down6_extra = UNetDown(512, 512, dropout=0.5, use_attention=True) 
-        self.down6 = UNetDown(512, 512, dropout=0.5, use_attention=True) 
-        self.down7 = UNetDown(512, 512, dropout=0.5, use_attention=True)
-        self.down8 = UNetDown(512, 512, dropout=0.5, use_attention=True)
+        self.down4 = UNetDown(256, 512, dropout=0.5, use_attention=True, num_heads=8)
+        self.down5 = UNetDown(512, 512, dropout=0.5, use_attention=True, num_heads=8)
+        self.down6_extra = UNetDown(512, 512, dropout=0.5, use_attention=True, num_heads=8) 
+        self.down6 = UNetDown(512, 512, dropout=0.5, use_attention=True, num_heads=8) 
+        self.down7 = UNetDown(512, 512, dropout=0.5, use_attention=True, num_heads=8)
+        self.down8 = UNetDown(512, 512, dropout=0.5, use_attention=True, num_heads=8)
         self.down9 = UNetDown(512, 512, normalize=False, dropout=0.5)
 
         self.up1 = UNetUp(512, 512, dropout=0.5)
