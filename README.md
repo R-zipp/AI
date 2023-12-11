@@ -108,9 +108,9 @@ AI기술을 활용하여 사용자가 도면을 입력하면 3D 파일(fbx, glb 
 
   pix2pix 모델을 이용하여 손 도면을 도면과 같은 형태로 이미지 생성
   
-  ||||||
-  | :---: | :---: | :---: | :---: | :---: |
-  | Epoch1 | Epoch10 | Epoch30 | Epoch50 | Epoch100 |
+  | ![0](https://github.com/R-zipp/AI/assets/141614581/6684026e-48b6-4e4f-8e7b-33e309562b41) | ![1000](https://github.com/R-zipp/AI/assets/141614581/3af64330-8269-4e27-b0b2-b9cee883c7da) | ![2000](https://github.com/R-zipp/AI/assets/141614581/d836a202-da8a-4ee7-9893-80880b88fafb) | ![3000](https://github.com/R-zipp/AI/assets/141614581/fcaabaca-19b2-4012-8f66-df4e9d40eaba) | ![4000](https://github.com/R-zipp/AI/assets/141614581/cfd7c2d6-dae3-4fda-bb0e-cda675d26d64) | ![47000](https://github.com/R-zipp/AI/assets/141614581/3bf1c84f-e643-4e83-ba59-7e8d7e7fb403) |
+  | :---: | :---: | :---: | :---: | :---: | :---: |
+  | Epoch1 | Epoch10 | Epoch30 | Epoch50 | Epoch100 | Epoch300 |
 
 ### 결과
 
@@ -120,6 +120,10 @@ AI기술을 활용하여 사용자가 도면을 입력하면 3D 파일(fbx, glb 
   | Hand drawing image | Generated blueprint | 3D file |
 
 <br/>
+
+# 시연 영상 / 발표 자료
+
+시연 영상 : https://www.youtube.com/watch?v=5uSdEBHfxK4&ab_channel=minkyo
 
 # 기술 스택
 
