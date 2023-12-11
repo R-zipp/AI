@@ -16,18 +16,28 @@ AI기술을 활용하여 사용자가 도면을 입력하면 3D 파일(fbx, glb 
 
 # 팀원 소개 및 역할
 
+**개발기간: 2023.10.07 ~ 2023.11.30**
+
 | AI | AI | server | Unreal | Unreal | Data science |
 |:--:|:--:|:------:|:------:|:------:|:------------:|
 | 정민교 | 김종민 | 김나영 | 김채린 | 반재형 | 강지석 |
 
-#### AI 세부 역할 분담
-- 정민교
-1. Blueprint to 3D를 활용하여 도면을 3D fbx파일로 변환
-2. FastAPI를 활용하여 모델 서빙
+### AI 세부 역할 분담
 
-- 김종민
-1. 손그림 학습을 위해 Stable Diffusion을 사용하여 데이터 셋 제작
-2. Hand drawting to Blueprint 모델 학습
+<table>
+  <tr>
+    <td align="center"><a href="https://github.com/MinkyoJeong1"><img src="https://avatars.githubusercontent.com/MinkyoJeong1" width="150px;" alt="">
+    <td align="center"><a href="https://github.com/jongminKims"><img src="https://avatars.githubusercontent.com/jongminKims" width="150px;" alt="">
+  </tr>
+  <tr>
+    <td align="center"><a href="https://github.com/MinkyoJeong1"><b>정민교</b></td>
+    <td align="center"><a href="https://github.com/jongminKims"><b>김종민</b></td>
+  </tr>
+  <tr>
+    <td align="center"> Blueprint to 3D를 이용한 도면 3D 파일로 변환,</br> FastAPI를 활용하여 모델 서빙 </td>
+    <td align="center"> Stable Diffusion을 사용하여 데이터 셋 제작,</br> Hand drawting to Blueprint 모델 학습 </td>
+  </tr>
+</table>
 
 <br/>
 
@@ -125,6 +135,10 @@ AI기술을 활용하여 사용자가 도면을 입력하면 3D 파일(fbx, glb 
 
 시연 영상 : https://www.youtube.com/watch?v=5uSdEBHfxK4&ab_channel=minkyo
 
+발표 자료 : https://github.com/R-zipp/AI/blob/main/Docs/AR%EC%A7%91_%EC%A7%91%EC%97%90%EA%B0%88%EC%88%98%EC%9E%88%EB%82%98%EC%98%81_Beta.pdf
+
+<br/>
+
 # 기술 스택
 
 ### - 언어
@@ -158,6 +172,8 @@ AI기술을 활용하여 사용자가 도면을 입력하면 3D 파일(fbx, glb 
 
 <br/>
 
+<br/>
+
 ---
 
-special thanks to [임정민](https://github.com/min731)
+special thanks to [정민](https://github.com/min731)
