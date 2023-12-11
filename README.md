@@ -133,6 +133,9 @@ AI기술을 활용하여 사용자가 도면을 입력하면 3D 파일(fbx, glb 
 
 # 시연 영상 / 발표 자료
 
+[![image](https://github.com/R-zipp/AI/assets/141614581/148ff1c6-df88-4417-8fdf-21ea3248d6d0)](https://www.youtube.com/watch?v=5uSdEBHfxK4&ab_channel=minkyo)
+
+
 시연 영상 : https://www.youtube.com/watch?v=5uSdEBHfxK4&ab_channel=minkyo
 
 발표 자료 : https://github.com/R-zipp/AI/blob/main/Docs/AR%EC%A7%91_%EC%A7%91%EC%97%90%EA%B0%88%EC%88%98%EC%9E%88%EB%82%98%EC%98%81_Beta.pdf
