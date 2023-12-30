@@ -1,20 +1,13 @@
-# R-ZIPP (AI part)
+# 🏠 R-집 : 도면 인식을 이용한 인테리어 플랫폼 (AI part)
 
 메타버스 아카데미 2기 최종 프로젝트
 
-<br/>
-
-# 프로젝트 소개
-
-도면을 업로드 하여 3D 그래픽으로 구현해 원하는 물품들을 원하는 위치에 가상으로 배치할 수 있는 인테리어 서비스
-
-AI기술을 활용하여 사용자가 도면을 입력하면 3D 파일(fbx, glb 등)로 결과를 반환
-
-모든 사람이 집 도면을 구할 수 없고 실제 있는 집이 아니라 가상의 집을 만들 수 있도록 손으로 그린 도면 그림을 이용하여 도면을 생성하는 기능을 추가하였음
+#### 🎥 시연 영상 보러가기([Click](https://www.youtube.com/watch?v=5uSdEBHfxK4&ab_channel=minkyo))
+#### 📙 발표자료 보러가기([Click](https://github.com/R-zipp/AI/blob/main/Docs/AR%EC%A7%91_%EC%A7%91%EC%97%90%EA%B0%88%EC%88%98%EC%9E%88%EB%82%98%EC%98%81_Beta.pdf))
 
 <br/>
 
-# 팀원 소개 및 역할
+# :family: 팀원 소개 및 역할
 
 **개발기간: 2023.10.07 ~ 2023.11.30**
 
@@ -25,23 +18,35 @@ AI기술을 활용하여 사용자가 도면을 입력하면 3D 파일(fbx, glb 
 ### AI 세부 역할 분담
 
 <table>
-  <tr>
-    <td align="center"><a href="https://github.com/MinkyoJeong1"><img src="https://avatars.githubusercontent.com/MinkyoJeong1" width="150px;" alt="">
-    <td align="center"><a href="https://github.com/jongminKims"><img src="https://avatars.githubusercontent.com/jongminKims" width="150px;" alt="">
-  </tr>
-  <tr>
-    <td align="center"><a href="https://github.com/MinkyoJeong1"><b>정민교</b></td>
-    <td align="center"><a href="https://github.com/jongminKims"><b>김종민</b></td>
-  </tr>
-  <tr>
-    <td align="center"> Blueprint to 3D를 이용한 도면 3D 파일로 변환,</br> FastAPI를 활용하여 모델 서빙 </td>
-    <td align="center"> Stable Diffusion을 사용하여 데이터 셋 제작,</br> Hand drawting to Blueprint 모델 학습 </td>
-  </tr>
+    <tbody>
+        <tr>
+            <td><b>정민교</b></td>
+            <td>Blueprint to 3D를 이용한 도면 3D 파일로 변환, FastAPI를 활용하여 모델 서빙</td>
+        </tr>
+        <tr>
+            <td><b>김종민</b></td>
+            <td>Stable Diffusion을 사용하여 데이터 셋 제작, Hand drawting to Blueprint 모델 학습</td>
+        </tr>
+    </tbody>
 </table>
 
 <br/>
 
-# 주요 기술
+# 🤝 융합 구조도
+
+<br/>
+
+# 💡 프로젝트 소개
+
+**도면을 업로드 하여 3D 그래픽으로 구현해 원하는 물품들을 원하는 위치에 가상으로 배치할 수 있는 인테리어 서비스**
+
+AI기술을 활용하여 사용자가 도면을 입력하면 3D 파일(fbx, glb 등)로 결과를 반환
+
+모든 사람이 집 도면을 구할 수 없고 실제 있는 집이 아니라 가상의 집을 만들 수 있도록 손으로 그린 도면 그림을 이용하여 도면을 생성하는 기능을 추가하였음
+
+<br/>
+
+# :scroll: 주요 내용
 
 ### Blueprint to 3D
 도면을 분석하여 벽과 방을 탐지하고 Blender script를 사용하여 3D파일로 변환
@@ -131,18 +136,7 @@ AI기술을 활용하여 사용자가 도면을 입력하면 3D 파일(fbx, glb 
 
 <br/>
 
-# 시연 영상 / 발표 자료
-
-[![image](https://github.com/R-zipp/AI/assets/141614581/148ff1c6-df88-4417-8fdf-21ea3248d6d0)](https://www.youtube.com/watch?v=5uSdEBHfxK4&ab_channel=minkyo)
-
-
-시연 영상 : https://www.youtube.com/watch?v=5uSdEBHfxK4&ab_channel=minkyo
-
-발표 자료 : https://github.com/R-zipp/AI/blob/main/Docs/AR%EC%A7%91_%EC%A7%91%EC%97%90%EA%B0%88%EC%88%98%EC%9E%88%EB%82%98%EC%98%81_Beta.pdf
-
-<br/>
-
-# 기술 스택
+# 🛠 기술 스택
 
 ### - 언어
 <img src="https://img.shields.io/badge/python-3776AB?style=for-the-badge&logo=python&logoColor=white">
@@ -156,7 +150,7 @@ AI기술을 활용하여 사용자가 도면을 입력하면 3D 파일(fbx, glb 
 ### - 협업 툴
 <img src="https://img.shields.io/badge/Github-181717?style=for-the-badge&logo=Github&logoColor=white"> <img src="https://img.shields.io/badge/Notion-000000?style=for-the-badge&logo=Notion&logoColor=white">
 
-# 참고자료
+# 🔍 참고자료
 
 ### Papers
 
