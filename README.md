@@ -13,7 +13,7 @@
 
 | AI | AI | server | Unreal | Unreal | Data science |
 |:--:|:--:|:------:|:------:|:------:|:------------:|
-| 정민교 | 김종민 | 김나영 | 김채린 | 반재형 | 강지석 |
+| [정민교](https://github.com/MinkyoJeong1) | [김종민](https://github.com/jongminKims) | [김나영](https://github.com/kny3037) | [김채린](https://github.com/cjssdfahkhdfudghsofiadsfipodsdfjg) | [반재형](https://github.com/BanBanjh) | [강지석](https://github.com/jisuk782) |
 
 ### AI 세부 역할 분담
 
